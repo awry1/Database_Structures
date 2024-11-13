@@ -4,13 +4,13 @@
 
 class Block {
     public:
-        std::array<Record, BLOCK_SIZE> records;
+        std::vector<Record> records;
 
         Block() = default;
-        Block(const std::array<Record, BLOCK_SIZE>& records);
+        Block(std::vector<Record>& records);
 
         void clear();
         void print() const;
-        void writeToFile(std::ofstream& file) const;
-        void readFromFile(std::ifstream& file);
+        void writeToFile(std::ofstream& file);
+        bool readFromFile(std::ifstream& file);
 };
