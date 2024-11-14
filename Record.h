@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <array>
 
 class Record {
     public:
@@ -18,7 +17,7 @@ class Record {
         Record compare(Record other) const;
         void randomize();
         void print() const;
-        void writeToFile(std::ofstream& file) const;
-        void readFromFile(std::ifstream& file);
+        void writeToFile(std::ofstream &file) const;
+        void readFromFile(std::ifstream &file);
         double product() const;
 };

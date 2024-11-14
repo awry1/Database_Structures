@@ -7,10 +7,16 @@ class Block {
         std::vector<Record> records;
 
         Block() = default;
-        Block(std::vector<Record>& records);
+        Block(std::vector<Record> &records);
 
         void clear();
         void print() const;
-        void writeToFile(std::ofstream& file);
-        bool readFromFile(std::ifstream& file);
+        void writeToFile(std::ofstream &file, int &counter);
+        bool readFromFile(std::ifstream &file, int &counter);
+
+        int size();
+        bool empty();
+        bool full();
+        Record first();
+        Record pop();
 };
