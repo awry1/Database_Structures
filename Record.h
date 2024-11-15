@@ -18,6 +18,8 @@ class Record {
         void writeToFile(std::ofstream &file) const;
         void readFromFile(std::ifstream &file);
 
-        Record compare(Record other) const;
+        void product();
         void randomize();
+        void readFromConsole();
+        Record compare(Record other) const;
 };

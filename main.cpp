@@ -1,4 +1,7 @@
 #include "Block.h"
+#define TAPE_A "tapeA.bin"
+#define TAPE_B "tapeB.bin"
+#define TAPE_C "tapeC.bin"
 
 int Fibonacci(bool reset) {
     // Returns the next number in the Fibonacci sequence
@@ -14,6 +17,21 @@ int Fibonacci(bool reset) {
     return fib[fib.size() - 2];
 }
 
+void inputRecords(std::string tapeName) {
+    std::ofstream tape(tapeName, std::ios::binary);
+    Record record;
+    int n;
+
+    std::cout << "Enter number of records: ";
+    std::cin >> n;
+    for (int i = 0; i < n; i++) {
+        record.readFromConsole();
+        record.print();
+        record.writeToFile(tape);
+    }
+    tape.close();
+}
+
 void generateRecords(std::string tapeName, int n) {
     std::ofstream tape(tapeName, std::ios::binary);
     for (int i = 0; i < n; i++) {
@@ -25,16 +43,16 @@ void generateRecords(std::string tapeName, int n) {
     std::cout << n << " records written to " << tapeName << std::endl << std::endl;
 }
 
-void split(std::string inputName, int &reads, int &writes, int &seriesA, int &seriesB) {
-    std::ifstream inFile(inputName, std::ios::binary);
+void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, int &writes, int &seriesA, int &seriesB) {
+    std::ifstream inFile(tapeC, std::ios::binary);
     Block input;
     input.inFile = &inFile;
 
-    std::ofstream outFileA("tapeA.bin", std::ios::binary);
+    std::ofstream outFileA(tapeA, std::ios::binary);
     Block outputA;
     outputA.outFile = &outFileA;
 
-    std::ofstream outFileB("tapeB.bin", std::ios::binary);
+    std::ofstream outFileB(tapeB, std::ios::binary);
     Block outputB;
     outputB.outFile = &outFileB;
 
@@ -54,15 +72,15 @@ void split(std::string inputName, int &reads, int &writes, int &seriesA, int &se
                     series += Fibonacci(false);
                     output = (output == &outputA) ? &outputB : &outputA;
                 }
-                std::cout << "series -> " << "A:" << outputA.series << " B:" << outputB.series << std::endl;
+                std::cout << "series -> " << "A:" << outputA.series << " | " << "B:" << outputB.series << std::endl;
                 //std::cout << std::endl;
             }
             if ((*output).isFull()) {
                 (*output).writeToFile(*(*output).outFile, writes);
             }
             (*output).records.push_back(record);
-            std::cout << record.Product << " -> ";
             record.print();
+            // TODO: Change to Block.last for better series recognition
             last = record.Product;
         }
         if (eof) {
@@ -76,7 +94,7 @@ void split(std::string inputName, int &reads, int &writes, int &seriesA, int &se
             }
         }
     }
-    std::cout << "final series -> " << "A:" << outputA.series << " B:" << outputB.series << std::endl;
+    std::cout << "final series -> " << "A:" << outputA.series << " | " << "B:" << outputB.series << std::endl;
     seriesA = outputA.series;
     seriesB = outputB.series;
     inFile.close();
@@ -84,14 +102,15 @@ void split(std::string inputName, int &reads, int &writes, int &seriesA, int &se
     outFileB.close();
 }
 
-void polyphaseMergeSort(std::string tapeName) {
+void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC) {
     int readCounter = 0;
     int writeCounter = 0;
     int seriesA = 0;
     int seriesB = 0;
     int seriesC = 0;
 
-    split(tapeName, readCounter, writeCounter, seriesA, seriesB);
+    // Split tape C into A and B
+    split(tapeA, tapeB, tapeC, readCounter, writeCounter, seriesA, seriesB);
     // Gaslight real number of series
 
     //while (true) {
@@ -108,9 +127,9 @@ void polyphaseMergeSort(std::string tapeName) {
 
 int main() {
     srand(unsigned int(time(NULL)));
-    std::string input = "tapeC.bin";
-    generateRecords(input, 20);
-    polyphaseMergeSort(input);
+    generateRecords(TAPE_C, 20);
+    //inputRecords(TAPE_C);
+    polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C);
 
     std::cout << std::endl;
     return 0;
