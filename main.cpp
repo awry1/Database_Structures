@@ -54,6 +54,8 @@ void split(std::string inputName, int &reads, int &writes, int &seriesA, int &se
                     series += Fibonacci(false);
                     output = (output == &outputA) ? &outputB : &outputA;
                 }
+                std::cout << "series -> " << "A:" << outputA.series << " B:" << outputB.series << std::endl;
+                //std::cout << std::endl;
             }
             if ((*output).isFull()) {
                 (*output).writeToFile(*(*output).outFile, writes);
@@ -64,16 +66,17 @@ void split(std::string inputName, int &reads, int &writes, int &seriesA, int &se
             last = record.Product;
         }
         if (eof) {
-            if (!outputA.isEmpty()) {
-                outputA.series++;
-                outputA.writeToFile(*outputA.outFile, writes);
+            if (!(*output).isEmpty()) {
+                (*output).series++;
+                (*output).writeToFile(*(*output).outFile, writes);
+                output = (output == &outputA) ? &outputB : &outputA;
             }
-            if (!outputB.isEmpty()) {
-                outputB.series++;
-                outputB.writeToFile(*outputB.outFile, writes);
+            if (!(*output).isEmpty()) {
+                (*output).writeToFile(*(*output).outFile, writes);
             }
         }
     }
+    std::cout << "final series -> " << "A:" << outputA.series << " B:" << outputB.series << std::endl;
     seriesA = outputA.series;
     seriesB = outputB.series;
     inFile.close();
@@ -89,8 +92,6 @@ void polyphaseMergeSort(std::string tapeName) {
     int seriesC = 0;
 
     split(tapeName, readCounter, writeCounter, seriesA, seriesB);
-    std::cout << std::endl << "Series A: " << seriesA;
-    std::cout << std::endl << "Series B: " << seriesB;
     // Gaslight real number of series
 
     //while (true) {
