@@ -14,10 +14,10 @@ class Record {
         Record() = default;
         Record(double a, double b, double s);
 
-        Record compare(Record other) const;
-        void randomize();
         void print() const;
         void writeToFile(std::ofstream &file) const;
         void readFromFile(std::ifstream &file);
-        double product() const;
+
+        Record compare(Record other) const;
+        void randomize();
 };

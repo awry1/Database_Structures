@@ -1,13 +1,12 @@
 #include "Block.h"
 
 Block::Block(std::vector<Record> &records) : records(records) {
+    inFile = nullptr;
+    outFile = nullptr;
+    series = 0;
     while (this->records.size() < BLOCK_SIZE) {
         this->records.push_back(Record());
     }
-}
-
-void Block::clear() {
-    records.clear();
 }
 
 void Block::print() const {
@@ -43,15 +42,19 @@ bool Block::readFromFile(std::ifstream &file, int &counter) {
     return eof;
 }
 
+void Block::clear() {
+    records.clear();
+}
+
 int Block::size() {
     return records.size();
 }
 
-bool Block::empty() {
+bool Block::isEmpty() {
     return records.empty();
 }
 
-bool Block::full() {
+bool Block::isFull() {
     return (records.size() == BLOCK_SIZE);
 }
 
@@ -60,7 +63,7 @@ Record Block::first() {
 }
 
 Record Block::pop() {
-    Record record = records.front();
+    Record record = first();
     records.erase(records.begin());
     return record;
 }
