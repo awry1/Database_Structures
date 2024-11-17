@@ -3,6 +3,10 @@
 // 2 zdarzenia - ich prawdopodobieństwa oraz prawdopodobieństwo sumy tych zdarzeń
 // Uporządkowanie wg prawdopodobieństwa iloczynu tych zdarzeń
 
+Record::Record() : A(0.0), B(0.0), Sum(0.0) {
+    product();
+}
+
 Record::Record(double a, double b, double s) : A(a), B(b), Sum(s) {
     product();
 }

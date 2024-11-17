@@ -1,9 +1,18 @@
 #include "Block.h"
 
+Block::Block() {
+    records = std::vector<Record>();
+    inFile = nullptr;
+    outFile = nullptr;
+    last = -INFINITY;
+    series = 1;
+}
+
 Block::Block(std::vector<Record> &records) : records(records) {
     inFile = nullptr;
     outFile = nullptr;
-    series = 0;
+    last = -INFINITY;
+    series = 1;
     while (this->records.size() < BLOCK_SIZE) {
         this->records.push_back(Record());
     }
@@ -46,16 +55,16 @@ void Block::clear() {
     records.clear();
 }
 
-int Block::size() {
-    return records.size();
-}
-
 bool Block::isEmpty() {
     return records.empty();
 }
 
 bool Block::isFull() {
     return (records.size() == BLOCK_SIZE);
+}
+
+int Block::size() {
+    return int(records.size());
 }
 
 Record Block::first() {

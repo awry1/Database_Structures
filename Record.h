@@ -11,7 +11,7 @@ class Record {
         double Sum;
         double Product;
 
-        Record() = default;
+        Record();
         Record(double a, double b, double s);
 
         void print() const;

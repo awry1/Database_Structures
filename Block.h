@@ -7,9 +7,10 @@ class Block {
         std::vector<Record> records;
         std::ifstream *inFile;
         std::ofstream *outFile;
+        double last;
         int series;
 
-        Block() = default;
+        Block();
         Block(std::vector<Record> &records);
 
         void print() const;
@@ -17,9 +18,9 @@ class Block {
         bool readFromFile(std::ifstream &file, int &counter);
 
         void clear();
-        int size();
         bool isEmpty();
         bool isFull();
+        int size();
         Record first();
         Record pop();
 };

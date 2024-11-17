@@ -5,16 +5,17 @@
 
 int Fibonacci(bool reset) {
     // Returns the next number in the Fibonacci sequence
-    // 0, 1, 1, 2, 3, 5, 8, 13, ...
-    static std::vector<int> fib = { 1, 0 };
+    // 0, 1, 1, 1, 2, 3, 5, 8, 13, ...
+    static std::vector<int> fib = { 0, 1 };
     if (reset) {
         fib.clear();
-        fib.push_back(1);
         fib.push_back(0);
+        fib.push_back(1);
         return -1;
     }
     fib.push_back(fib[fib.size() - 1] + fib[fib.size() - 2]);
-    return fib[fib.size() - 2];
+    //std::cout << "curr fib: " << fib[fib.size() - 3] << std::endl;
+    return fib[fib.size() - 3];
 }
 
 void inputRecords(std::string tapeName) {
@@ -60,17 +61,18 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
 
     int series = 1;
     bool eof = false;
-    double last = -INFINITY;
     while (!eof) {
         eof = input.readFromFile(*input.inFile, reads);
         while (!input.isEmpty()) {
             Record record = input.pop();
-            if (record.Product < last) {
+            if (record.Product < (*output).last) {
                 // End of series
-                (*output).series++;
                 if ((*output).series == series) {
                     series += Fibonacci(false);
                     output = (output == &outputA) ? &outputB : &outputA;
+                }
+                if (record.Product < (*output).last) {
+                    (*output).series++;
                 }
                 std::cout << "series -> " << "A:" << outputA.series << " | " << "B:" << outputB.series << std::endl;
                 //std::cout << std::endl;
@@ -79,17 +81,15 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
                 (*output).writeToFile(*(*output).outFile, writes);
             }
             (*output).records.push_back(record);
-            record.print();
-            // TODO: Change to Block.last for better series recognition
-            last = record.Product;
+            //record.print();
+            (*output).last = record.Product;
         }
         if (eof) {
-            if (!(*output).isEmpty()) {
-                (*output).series++;
+            if ((*output).isFull()) {
                 (*output).writeToFile(*(*output).outFile, writes);
-                output = (output == &outputA) ? &outputB : &outputA;
             }
-            if (!(*output).isEmpty()) {
+            output = (output == &outputA) ? &outputB : &outputA;
+            if ((*output).isFull()) {
                 (*output).writeToFile(*(*output).outFile, writes);
             }
         }
@@ -111,7 +111,7 @@ void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC)
 
     // Split tape C into A and B
     split(tapeA, tapeB, tapeC, readCounter, writeCounter, seriesA, seriesB);
-    // Gaslight real number of series
+    // Gaslight the series numbers to make them fit the Fibonacci sequence
 
     //while (true) {
     //    // Merge A and B into C
@@ -127,7 +127,7 @@ void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC)
 
 int main() {
     srand(unsigned int(time(NULL)));
-    generateRecords(TAPE_C, 20);
+    generateRecords(TAPE_C, 47);
     //inputRecords(TAPE_C);
     polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C);
 
