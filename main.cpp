@@ -91,6 +91,7 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
 }
 
 void correctSeries(int series1, int series2, int& newSeries1, int& newSeries2) {
+    // calculate empty series in one tape, merge them at the beginning of merge fase
     Fibonacci fib;
     if (!(fib.isFib(series1) || fib.isFib(series2))) {
         std::cout << "something went wrong, both series are not Fibonacci numbers" << std::endl;
