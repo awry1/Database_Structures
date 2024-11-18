@@ -1,22 +1,8 @@
 #include "Block.h"
+#include "Fibonacci.h"
 #define TAPE_A "tapeA.bin"
 #define TAPE_B "tapeB.bin"
 #define TAPE_C "tapeC.bin"
-
-int Fibonacci(bool reset) {
-    // Returns the next number in the Fibonacci sequence
-    // 0, 1, 1, 1, 2, 3, 5, 8, 13, ...
-    static std::vector<int> fib = { 0, 1 };
-    if (reset) {
-        fib.clear();
-        fib.push_back(0);
-        fib.push_back(1);
-        return -1;
-    }
-    fib.push_back(fib[fib.size() - 1] + fib[fib.size() - 2]);
-    //std::cout << "curr fib: " << fib[fib.size() - 3] << std::endl;
-    return fib[fib.size() - 3];
-}
 
 void inputRecords(std::string tapeName) {
     std::ofstream tape(tapeName, std::ios::binary);
@@ -59,6 +45,8 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
 
     Block* output = &outputA;
 
+    Fibonacci fib;
+
     int series = 1;
     bool eof = false;
     while (!eof) {
@@ -68,7 +56,7 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
             if (record.Product < (*output).last) {
                 // End of series
                 if ((*output).series == series) {
-                    series += Fibonacci(false);
+                    series += fib.next();
                     output = (output == &outputA) ? &outputB : &outputA;
                 }
                 if (record.Product < (*output).last) {
@@ -102,17 +90,44 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
     outFileB.close();
 }
 
+void correctSeries(int series1, int series2, int& newSeries1, int& newSeries2) {
+    Fibonacci fib;
+    if (!(fib.isFib(series1) || fib.isFib(series2))) {
+        std::cout << "something went wrong, both series are not Fibonacci numbers" << std::endl;
+        return;
+    }
+    if (fib.isFib(series1) && fib.isFib(series2)) {
+        newSeries1 = fib.next(newSeries1);
+    }
+    if (!fib.isFib(series1)) {
+        newSeries1 = fib.closestFib(series1);
+        if (newSeries1 == series2) {
+            newSeries1 = fib.next(newSeries1);
+        }
+    }
+    if (!fib.isFib(series2)) {
+        newSeries2 = fib.closestFib(series2);
+        if (newSeries2 == newSeries1) {
+            newSeries2 = fib.next(newSeries2);
+        }
+    }
+    std::cout << "corrected series -> " << newSeries1 << " | " << newSeries2 << std::endl;
+}
+
 void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC) {
     int readCounter = 0;
     int writeCounter = 0;
     int seriesA = 0;
     int seriesB = 0;
     int seriesC = 0;
+    Fibonacci fib;
 
     // Split tape C into A and B
     split(tapeA, tapeB, tapeC, readCounter, writeCounter, seriesA, seriesB);
     // Gaslight the series numbers to make them fit the Fibonacci sequence
-
+    int newSeriesA = seriesA;
+    int newSeriesB = seriesB;
+    correctSeries(seriesA, seriesB, newSeriesA, newSeriesB);
     //while (true) {
     //    // Merge A and B into C
     //    // If A is empty, merge B and C into A
