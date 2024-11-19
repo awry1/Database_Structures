@@ -4,6 +4,17 @@
 #define TAPE_B "tapeB.bin"
 #define TAPE_C "tapeC.bin"
 
+void printTape(std::string tapeName, std::string displayName) {
+    std::ifstream tape(tapeName, std::ios::binary);
+    std::cout << std::endl << displayName << std::endl;
+    Record record;
+    while (!tape.eof()) {
+        record.readFromFile(tape);
+        record.print();
+    }
+    tape.close();
+}
+
 void inputRecords(std::string tapeName) {
     std::ofstream tape(tapeName, std::ios::binary);
     Record record;
@@ -12,25 +23,31 @@ void inputRecords(std::string tapeName) {
     std::cout << "Enter number of records: ";
     std::cin >> n;
     for (int i = 0; i < n; i++) {
+        std::cout << "Record " << i + 1 << std::endl;
         record.readFromConsole();
         record.print();
         record.writeToFile(tape);
     }
     tape.close();
+    std::cout << n << " records written to " << tapeName << std::endl;
 }
 
-void generateRecords(std::string tapeName, int n) {
+void generateRecords(std::string tapeName) {
     std::ofstream tape(tapeName, std::ios::binary);
+    Record record;
+    int n;
+
+    std::cout << "Enter number of records: ";
+    std::cin >> n;
     for (int i = 0; i < n; i++) {
-        Record record;
         record.randomize();
         record.writeToFile(tape);
     }
     tape.close();
-    std::cout << n << " records written to " << tapeName << std::endl << std::endl;
+    std::cout << n << " records written to " << tapeName << std::endl;
 }
 
-void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, int &writes, int &seriesA, int &seriesB) {
+void splitInputFile(std::string tapeA, std::string tapeB, std::string tapeC, int& reads, int& writes, int& seriesA, int& seriesB, bool display) {
     std::ifstream inFile(tapeC, std::ios::binary);
     Block input;
     input.inFile = &inFile;
@@ -62,7 +79,6 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
                 if (record.Product < (*output).last) {
                     (*output).series++;
                 }
-                std::cout << "series -> " << "A:" << outputA.series << " | " << "B:" << outputB.series << std::endl;
                 //std::cout << std::endl;
             }
             if ((*output).isFull()) {
@@ -82,71 +98,137 @@ void split(std::string tapeA, std::string tapeB, std::string tapeC, int &reads, 
             }
         }
     }
-    std::cout << "final series -> " << "A:" << outputA.series << " | " << "B:" << outputB.series << std::endl;
     seriesA = outputA.series;
     seriesB = outputB.series;
     inFile.close();
     outFileA.close();
     outFileB.close();
+
+    if (display) {
+        printTape(tapeA, "tape A");
+        printTape(tapeB, "tape B");
+        std::cout << std::endl << "Series A: " << seriesA;
+        std::cout << std::endl << "Series B: " << seriesB;
+        std::cout << std::endl << "Press Enter to continue...";
+        std::cin.ignore();
+        std::cin.get();
+    }
 }
 
-void correctSeries(int series1, int series2, int& newSeries1, int& newSeries2) {
-    // calculate empty series in one tape, merge them at the beginning of merge fase
+void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2) {
     Fibonacci fib;
     if (!(fib.isFib(series1) || fib.isFib(series2))) {
-        std::cout << "something went wrong, both series are not Fibonacci numbers" << std::endl;
-        return;
+        std::cout << "Both series are not Fibonacci numbers" << std::endl;
+        exit(1);
     }
     if (fib.isFib(series1) && fib.isFib(series2)) {
-        newSeries1 = fib.next(newSeries1);
+        dummies2 = fib.next(series2) - series2;
+        std::cout << std::endl << "dummies 2: " << dummies2;
+        return;
     }
     if (!fib.isFib(series1)) {
-        newSeries1 = fib.closestFib(series1);
-        if (newSeries1 == series2) {
-            newSeries1 = fib.next(newSeries1);
+        int nextFib = fib.closestFib(series1);
+        if (nextFib == series2) {
+            nextFib = fib.next(nextFib);
         }
+        dummies1 = nextFib - series1;
+        std::cout << std::endl << "dummies 1: " << dummies1;
+        return;
     }
     if (!fib.isFib(series2)) {
-        newSeries2 = fib.closestFib(series2);
-        if (newSeries2 == newSeries1) {
-            newSeries2 = fib.next(newSeries2);
+        int nextFib = fib.closestFib(series2);
+        if (nextFib == series1) {
+            nextFib = fib.next(nextFib);
         }
+        dummies2 = nextFib - series2;
+        std::cout << std::endl << "dummies 2: " << dummies2;
+        return;
     }
-    std::cout << "corrected series -> " << newSeries1 << " | " << newSeries2 << std::endl;
 }
 
-void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC) {
-    int readCounter = 0;
-    int writeCounter = 0;
+bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut, int& reads, int& writes, int& seriesIn1, int& seriesIn2, int& seriesOut) {
+    std::ifstream inFile1(tapeIn1, std::ios::binary);
+    Block input1;
+    input1.inFile = &inFile1;
+
+    std::ifstream inFile2(tapeIn2, std::ios::binary);
+    Block input2;
+    input2.inFile = &inFile2;
+
+    std::ofstream outFile(tapeOut, std::ios::binary);
+    Block output;
+    output.outFile = &outFile;
+
+    Fibonacci fib;
+
+    int dummies1 = 0;
+    int dummies2 = 0;
+    calculateDummySeries(seriesIn1, seriesIn2, dummies1, dummies2);
+
+    // TODO: Merge series (first dummy series)
+
+    // Update tapes
+    std::string tmp;
+    if (seriesIn1 == 0) {
+        tmp = tapeIn1;
+        tapeIn1 = tapeOut;
+        tapeOut = tmp;
+    }
+    else if (seriesIn2 == 0) {
+        tmp = tapeIn2;
+        tapeIn2 = tapeOut;
+        tapeOut = tmp;
+    }
+    else {
+        std::cout << std::endl << "No empty tape after merging" << std::endl;
+        exit(1);
+    }
+    return true;
+}
+
+void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC, bool display) {
+    int reads = 0;
+    int writes = 0;
     int seriesA = 0;
     int seriesB = 0;
     int seriesC = 0;
-    Fibonacci fib;
+
+    if (display) {
+        printTape(tapeC, "input");
+    }
 
     // Split tape C into A and B
-    split(tapeA, tapeB, tapeC, readCounter, writeCounter, seriesA, seriesB);
-    // Gaslight the series numbers to make them fit the Fibonacci sequence
-    int newSeriesA = seriesA;
-    int newSeriesB = seriesB;
-    correctSeries(seriesA, seriesB, newSeriesA, newSeriesB);
-    //while (true) {
-    //    // Merge A and B into C
-    //    // If A is empty, merge B and C into A
-    //    // If B is empty, merge A and C into B
-    //    // If C is empty, merge A and B into C
-    //    // Repeat until 2 files are empty
-    //}
+    splitInputFile(tapeA, tapeB, tapeC, reads, writes, seriesA, seriesB, display);
 
-    std::cout << std::endl << "Read counter: " << readCounter;
-    std::cout << std::endl << "Write counter: " << writeCounter;
+    std::string tapeIn1 = tapeA;
+    std::string tapeIn2 = tapeB;
+    std::string tapeOut = tapeC;
+    bool sorted = false;
+    while (!sorted) {
+        // Merge 2 non-empty tapes
+        sorted = mergeFiles(tapeIn1, tapeIn2, tapeOut, reads, writes, seriesA, seriesB, seriesC);
+    }
+
+    if (display) {
+        printTape(tapeC, "output");     // Temporary
+    }
+    std::cout << std::endl << "File sorted";
+    std::cout << std::endl << "Read counter: " << reads;
+    std::cout << std::endl << "Write counter: " << writes;
 }
 
 int main() {
     srand(unsigned int(time(NULL)));
-    generateRecords(TAPE_C, 47);
-    //inputRecords(TAPE_C);
-    polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C);
-
+    // TODO: Implement menu
+    bool autoGenerate = true;
+    bool display = true;
+    if (autoGenerate) {
+        generateRecords(TAPE_C);
+    }
+    else {
+        inputRecords(TAPE_C);
+    }
+    polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C, display);
     std::cout << std::endl;
     return 0;
 }

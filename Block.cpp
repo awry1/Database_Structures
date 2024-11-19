@@ -8,7 +8,7 @@ Block::Block() {
     series = 1;
 }
 
-Block::Block(std::vector<Record> &records) : records(records) {
+Block::Block(std::vector<Record>& records) : records(records) {
     inFile = nullptr;
     outFile = nullptr;
     last = -INFINITY;
@@ -24,7 +24,7 @@ void Block::print() const {
     }
 }
 
-void Block::writeToFile(std::ofstream &file, int &counter) {
+void Block::writeToFile(std::ofstream& file, int& counter) {
     for (int i = 0; i < records.size(); i++) {
         records[i].writeToFile(file);
     }
@@ -32,7 +32,7 @@ void Block::writeToFile(std::ofstream &file, int &counter) {
     counter++;
 }
 
-bool Block::readFromFile(std::ifstream &file, int &counter) {
+bool Block::readFromFile(std::ifstream& file, int& counter) {
     bool eof = false;
     bool empty = true;
     while (records.size() < BLOCK_SIZE) {
