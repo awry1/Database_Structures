@@ -14,7 +14,7 @@ Record::Record(double a, double b, double s) : A(a), B(b), Sum(s) {
 void Record::print() const {
     std::cout << std::fixed << std::setprecision(2);
     std::cout << Product << " -> ";
-    std::cout << "A:" << A << " B:" << B << " Sum:" << Sum << std::endl;
+    std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
     //std::cout << std::endl;
 }
 

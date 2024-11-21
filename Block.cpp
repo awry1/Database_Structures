@@ -5,14 +5,14 @@ Block::Block() {
     inFile = nullptr;
     outFile = nullptr;
     last = -INFINITY;
-    series = 1;
+    series = 0;
 }
 
 Block::Block(std::vector<Record>& records) : records(records) {
     inFile = nullptr;
     outFile = nullptr;
     last = -INFINITY;
-    series = 1;
+    series = 0;
     while (this->records.size() < BLOCK_SIZE) {
         this->records.push_back(Record());
     }
