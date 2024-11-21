@@ -1,6 +1,10 @@
 *
 !/.gitignore
 !/.gitattributes
+!/*.sln
+!/*.vcxproj
+!/*.vcxproj.filters
+!/*.vcxproj.user
 !/*.h
 !/*.cpp
 !/*.md
