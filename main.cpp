@@ -150,37 +150,32 @@ void splitInputFile(std::string tapeA, std::string tapeB, std::string tapeC, int
 void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2) {
     Fibonacci fib;
 
-    // Fix error handling when one of the series is not Fibonacci
-    if (!(fib.isFib(series1) || fib.isFib(series2))) {
+    if (!fib.isFib(series1) && !fib.isFib(series2)) {
         std::cout << std::endl << "Both series are not Fibonacci numbers" << std::endl;
         exit(1);
     }
     if (fib.isFib(series1) && fib.isFib(series2)) {
         if (series1 == series2) {
+            if (series1 == 1) {
+                return;
+            }
             dummies2 = fib.next(series2) - series2;
             return;
         }
-        int min = std::min(series1, series2);
-        int max = std::max(series1, series2);
-        int nextFib = fib.next(min);
-        if (nextFib != max) {
-            if (nextFib != min) {   // fib.next(1) = 1
-                std::cout << std::endl << "Series ended up wrong" << std::endl;
-                exit(1);
-            }
+        int smaller = std::min(series1, series2);
+        int larger = std::max(series1, series2);
+        int nextFib = fib.next(smaller);
+        if (nextFib == larger) {
             return;
         }
+        if (nextFib == smaller) {
+            return;
+        }
+        std::cout << std::endl << "Series are Fibonacci numbers but not consecutive" << std::endl;
     }
+    // Add error handling
     if (!fib.isFib(series1)) {
-        int nextFib = fib.closestFib(series1);
-        if (nextFib < series2) {
-            std::cout << std::endl << "Series ended up wrong" << std::endl;
-            exit(1);
-        }
-        if (nextFib > fib.closestFib(series2)) {
-            std::cout << std::endl << "Series ended up wrong" << std::endl;
-            exit(1);
-        }
+        int nextFib = fib.next(series1);
         if (nextFib == series2) {
             nextFib = fib.next(nextFib);
         }
@@ -189,14 +184,6 @@ void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2
     }
     if (!fib.isFib(series2)) {
         int nextFib = fib.closestFib(series2);
-        if (nextFib < series1) {
-            std::cout << std::endl << "Series ended up wrong" << std::endl;
-            exit(1);
-        }
-        if (nextFib > fib.closestFib(series1)) {
-            std::cout << std::endl << "Series ended up wrong" << std::endl;
-            exit(1);
-        }
         if (nextFib == series1) {
             nextFib = fib.next(nextFib);
         }
@@ -267,17 +254,17 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
     Fibonacci fib;
 
     std::cout << "Merging tapes " << tapeIn1 << " and " << tapeIn2 << " to " << tapeOut << std::endl;
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << std::endl;
+    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | before" << std::endl;
 
     int dummies1 = 0;
     int dummies2 = 0;
     calculateDummySeries(seriesIn1, seriesIn2, dummies1, dummies2);
+    std::cout << " " << dummies1 << " " << dummies2 << std::endl;
     handleDummySeries(input1, input2, output, seriesIn1, seriesIn2, seriesOut, dummies1, dummies2, reads, writes);
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << std::endl;
+    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | after dummies" << std::endl;
 
     int series = std::min(seriesIn1, seriesIn2);
 
-    // Somehow output have more series than should (from 1 and 1 makes 2, 5 and 3 makes 4)
     bool eof1 = false;
     bool eof2 = false;
     bool stop1 = false;
@@ -320,34 +307,14 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
                 output.last = record2.Product;
                 input2.last = record2.Product;
             }
-            if (eof1 || eof2) {
-                break;
-            }
         }
-        while (!stop1) {
-            eof1 = input1.readFromFile(*input1.inFile, reads);
-            while (!input1.isEmpty()) {
-                Record record = input1.first();
-                if (record.Product < input1.last) {
-                    // End of series
-                    stop1 = true;
-                    break;
-                }
-                if (record.Product < output.last) {
-                    seriesOut++;
-                }
-                if (output.isFull()) {
-                    output.writeToFile(*output.outFile, writes);
-                }
-                output.records.push_back(input1.pop());
-                output.last = record.Product;
-                input1.last = record.Product;
-            }
-            if (eof1) {
-                break;
-            }
+        if (eof1 && input1.isEmpty()) {
+            stop1 = true;
         }
-        while (!stop2) {
+        if (eof2 && input2.isEmpty()) {
+            stop2 = true;
+        }
+        if (!stop2 && stop1) {
             eof2 = input2.readFromFile(*input2.inFile, reads);
             while (!input2.isEmpty()) {
                 Record record = input2.first();
@@ -367,10 +334,35 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
                 input2.last = record.Product;
             }
             if (eof2) {
+                stop2 = true;
                 break;
             }
         }
-        if ((stop1 || eof1) && (stop2 || eof2)) {
+        if (!stop1 && stop2) {
+            eof1 = input1.readFromFile(*input1.inFile, reads);
+            while (!input1.isEmpty()) {
+                Record record = input1.first();
+                if (record.Product < input1.last) {
+                    // End of series
+                    stop1 = true;
+                    break;
+                }
+                if (record.Product < output.last) {
+                    seriesOut++;
+                }
+                if (output.isFull()) {
+                    output.writeToFile(*output.outFile, writes);
+                }
+                output.records.push_back(input1.pop());
+                output.last = record.Product;
+                input1.last = record.Product;
+            }
+            if (eof1) {
+                stop1 = true;
+                break;
+            }
+        }
+        if (stop1 && stop2) {
             series--;
             seriesIn1 -= 1;
             seriesIn2 -= 1;
@@ -447,7 +439,7 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
             }
         }
     }
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << std::endl;
+    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | after merge" << std::endl;
 
     phases++;
 
@@ -531,7 +523,7 @@ int main() {
     srand(unsigned int(time(NULL)));
     // TODO: Implement menu
     bool autoGenerate = true;
-    bool display = true;
+    bool display = false;
     if (autoGenerate) {
         generateRecords(TAPE_C);
     }
