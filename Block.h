@@ -1,6 +1,6 @@
 #pragma once
 #include "Record.h"
-#define BLOCK_SIZE 4
+#define BLOCK_SIZE 100
 
 class Block {
 public:

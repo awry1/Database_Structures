@@ -15,7 +15,6 @@ void Record::print() const {
     std::cout << std::fixed << std::setprecision(2);
     std::cout << Product << " -> ";
     std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
-    //std::cout << std::endl;
 }
 
 void Record::writeToFile(std::ofstream& file) const {
@@ -44,7 +43,6 @@ void Record::randomize() {
     double min = std::max(A, B);
     double max = std::min(1.0, A + B);
     Sum = std::round((min + (rand() / (float)RAND_MAX) * (max - min)) * 100) / 100.0;
-    // Calculate Product
     product();
 }
 

@@ -4,6 +4,34 @@
 #define TAPE_B "tapeB.bin"
 #define TAPE_C "tapeC.bin"
 
+void getInputInfo(std::string tapeName, int& series, int& records) {
+    std::ifstream tape(tapeName, std::ios::binary);
+    Record newRecord;
+    series = 0;
+    records = 0;
+    double last = INFINITY;
+    while (true) {
+        newRecord.readFromFile(tape);
+        if (tape.eof()) {
+            break;
+        }
+        if (newRecord.Product < last) {
+            series++;
+        }
+        records++;
+        last = newRecord.Product;
+    }
+    tape.close();
+    if (records == 0) {
+        std::cout << std::endl << "Empty input file" << std::endl;
+        exit(1);
+    }
+    std::cout << std::endl << "Records: " << records;
+    std::cout << std::endl << "Series: " << series;
+    std::cout << std::endl << "Block: " << BLOCK_SIZE << " records";
+    std::cout << std::endl;
+}
+
 void printTape(std::string tapeName, std::string displayName) {
     std::ifstream tape(tapeName, std::ios::binary);
     std::cout << std::endl << displayName << std::endl;
@@ -17,6 +45,7 @@ void printTape(std::string tapeName, std::string displayName) {
         newRecord.readFromFile(tape);
         if (tape.eof()) {
             if (!empty) {
+                std::cout << "Records: " << records << std::endl;
                 std::cout << "Series: " << series << std::endl;
             }
             else {
@@ -25,10 +54,11 @@ void printTape(std::string tapeName, std::string displayName) {
             break;
         }
         if (newRecord.Product < last) {
-            std::cout << std::endl;
+            //std::cout << std::endl;
             series++;
         }
-        std::cout << ++records << ": ";
+        records++;
+        //std::cout << records << ": ";
         newRecord.print();
         last = newRecord.Product;
         empty = false;
@@ -175,6 +205,14 @@ void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2
     }
     // Add error handling
     if (!fib.isFib(series1)) {
+        if (series1 > fib.next(series2)) {
+            std::cout << std::endl << "Series 1 is too large" << std::endl;
+            exit(1);
+        }
+        if (series1 < fib.next(series2) - series2) {
+            std::cout << std::endl << "Series 1 is too small" << std::endl;
+            exit(1);
+        }
         int nextFib = fib.next(series1);
         if (nextFib == series2) {
             nextFib = fib.next(nextFib);
@@ -183,6 +221,14 @@ void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2
         return;
     }
     if (!fib.isFib(series2)) {
+        if (series2 > fib.next(series1)) {
+            std::cout << std::endl << "Series 2 is too large" << std::endl;
+            exit(1);
+        }
+        if (series2 < fib.next(series1) - series1) {
+            std::cout << std::endl << "Series 2 is too small" << std::endl;
+            exit(1);
+        }
         int nextFib = fib.closestFib(series2);
         if (nextFib == series1) {
             nextFib = fib.next(nextFib);
@@ -236,6 +282,31 @@ void handleDummySeries(Block& input1, Block& input2, Block& output, int& series1
 }
 
 bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut, int& seriesIn1, int& seriesIn2, int& seriesOut, int& reads, int& writes, int& phases, bool display) {
+    if (seriesIn1 == 0) {
+        std::string tmpTape;
+        tmpTape = tapeIn2;
+        tapeIn2 = tapeOut;
+        tapeOut = tmpTape;
+        int tmpSeries;
+        tmpSeries = seriesIn2;
+        seriesIn2 = seriesOut;
+        seriesOut = tmpSeries;
+
+        return true;
+    }
+    if (seriesIn2 == 0) {
+        std::string tmpTape;
+        tmpTape = tapeIn1;
+        tapeIn1 = tapeOut;
+        tapeOut = tmpTape;
+        int tmpSeries;
+        tmpSeries = seriesIn1;
+        seriesIn1 = seriesOut;
+        seriesOut = tmpSeries;
+
+        return true;
+    }
+
     std::ifstream inFile1(tapeIn1, std::ios::binary);
     Block input1;
     input1.inFile = &inFile1;
@@ -253,15 +324,10 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
 
     Fibonacci fib;
 
-    std::cout << "Merging tapes " << tapeIn1 << " and " << tapeIn2 << " to " << tapeOut << std::endl;
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | before" << std::endl;
-
     int dummies1 = 0;
     int dummies2 = 0;
     calculateDummySeries(seriesIn1, seriesIn2, dummies1, dummies2);
-    std::cout << " " << dummies1 << " " << dummies2 << std::endl;
     handleDummySeries(input1, input2, output, seriesIn1, seriesIn2, seriesOut, dummies1, dummies2, reads, writes);
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | after dummies" << std::endl;
 
     int series = std::min(seriesIn1, seriesIn2);
 
@@ -439,7 +505,6 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
             }
         }
     }
-    std::cout << " " << seriesIn1 << " " << seriesIn2 << " " << seriesOut << " | after merge" << std::endl;
 
     phases++;
 
@@ -454,10 +519,10 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
         std::cin.get();
     }
 
-    std::string tmpTape;
-    int tmpSeries;
     // Tries to make tape2 > tape1
     if (seriesIn1 == 0) {
+        std::string tmpTape;
+        int tmpSeries;
         tmpTape = tapeIn1;
         tapeIn1 = tapeIn2;
         tapeIn2 = tapeOut;
@@ -470,6 +535,8 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
         return false;
     }
     if (seriesIn2 == 0) {
+        std::string tmpTape;
+        int tmpSeries;
         tmpTape = tapeIn2;
         tapeIn2 = tapeOut;
         tapeOut = tmpTape;
@@ -483,16 +550,27 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
     exit(1);
 }
 
-void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC, bool display) {
+void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC, bool display, bool printInOut) {
     int reads = 0;
     int writes = 0;
     int phases = 0;
     int seriesA = 0;
     int seriesB = 0;
     int seriesC = 0;
+    int seriesInput = 0;
+    int recordsInput = 0;
+    float time0 = 0.0;
 
-    if (display) {
+    getInputInfo(tapeC, seriesInput, recordsInput);
+    int avgPhases = int(std::round(1.45 * log2(seriesInput)));
+    int avgReadsWrites = std::round(2.0 * recordsInput * (1.04 * log2(seriesInput) + 1) / BLOCK_SIZE);
+
+    if (printInOut) {
         printTape(tapeC, "Input file");
+    }
+
+    if (!display) {
+        time0 = clock();
     }
 
     splitInputFile(tapeA, tapeB, tapeC, seriesA, seriesB, reads, writes, display);
@@ -509,27 +587,70 @@ void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC,
         sorted = mergeFiles(tapeIn1, tapeIn2, tapeOut, seriesIn1, seriesIn2, seriesOut, reads, writes, phases, display);
     }
 
+    if (seriesOut != 1) {
+        std::cout << std::endl << "More than 1 series in output" << std::endl;
+        exit(1);
+    }
+
+    if (!display && !printInOut) {
+        time0 = std::round((clock() - time0) / CLOCKS_PER_SEC * 100) / 100.0;
+    }
+
     std::cout << std::endl << "------ After sorting --------";
-    if (display) {
+    if (printInOut) {
         printTape(tapeOut, "Sorted file");
     }
+    std::cout << std::endl << "Phases: " << phases;
     std::cout << std::endl << "Reads: " << reads;
     std::cout << std::endl << "Writes: " << writes;
-    std::cout << std::endl << "Phases: " << phases;
+    std::cout << std::endl << "Disk operations: " << reads + writes;
     std::cout << std::endl;
+    std::cout << std::endl << "Theoretical phases: " << avgPhases;
+    std::cout << std::endl << "Theoretical disk operations: " << avgReadsWrites;
+    std::cout << std::endl;
+    if (!display && !printInOut) {
+        std::cout << std::endl << "Time: " << time0 << "s" << std::endl;
+    }
 }
 
 int main() {
     srand(unsigned int(time(NULL)));
-    // TODO: Implement menu
-    bool autoGenerate = true;
-    bool display = false;
-    if (autoGenerate) {
+    int choice;
+    bool afterPhase;
+    bool printInOut = false;
+
+    std::cout << "Polyphase merge sort" << std::endl;
+    std::cout << "1. Generate records" << std::endl;
+    std::cout << "2. Input records" << std::endl;
+    std::cout << "3. Read from file" << std::endl;
+    std::cout << "Enter choice: ";
+    std::cin >> choice;
+    std::cin.ignore();
+    switch (choice)
+    {
+    case 1:
         generateRecords(TAPE_C);
-    }
-    else {
+        break;
+    case 2:
         inputRecords(TAPE_C);
+        break;
+    case 3:
+        std::cout << "Filename: " << TAPE_C << std::endl;
+        std::cout << "OK? (0/1): ";
+        std::cin >> choice;
+        if (choice == 0) {
+            std::cout << "Too bad" << std::endl;
+            exit(1);
+        }
+        break;
+    default:
+        std::cout << "Invalid choice" << std::endl;
+        exit(1);
+        break;
     }
-    polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C, display);
+    std::cout << "Display after phases? (0/1): ";
+    std::cin >> afterPhase;
+    std::cin.ignore();
+    polyphaseMergeSort(TAPE_A, TAPE_B, TAPE_C, afterPhase, printInOut);
     return 0;
 }
