@@ -60,15 +60,15 @@ void Block::clear() {
     records.clear();
 }
 
-bool Block::isEmpty() {
+bool Block::isEmpty() const {
     return records.empty();
 }
 
-bool Block::isFull() {
+bool Block::isFull() const {
     return (records.size() == BLOCK_SIZE);
 }
 
-int Block::size() {
+int Block::size() const {
     return int(records.size());
 }
 

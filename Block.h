@@ -1,6 +1,6 @@
 #pragma once
 #include "Record.h"
-#define BLOCK_SIZE 100
+constexpr auto BLOCK_SIZE = 100;
 
 class Block {
 public:
@@ -18,9 +18,9 @@ public:
     bool readFromFile(std::ifstream& file, int& counter);
 
     void clear();
-    bool isEmpty();
-    bool isFull();
-    int size();
+    bool isEmpty() const;
+    bool isFull() const;
+    int size() const;
     Record first();
     Record pop();
 };

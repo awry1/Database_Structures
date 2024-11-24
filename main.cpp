@@ -1,10 +1,10 @@
 #include "Block.h"
 #include "Fibonacci.h"
-#define TAPE_A "tapeA.bin"
-#define TAPE_B "tapeB.bin"
-#define TAPE_C "tapeC.bin"
+constexpr auto TAPE_A = "tapeA.bin";
+constexpr auto TAPE_B = "tapeB.bin";
+constexpr auto TAPE_C = "tapeC.bin";
 
-void getInputInfo(std::string tapeName, int& series, int& records) {
+static void getInputInfo(std::string tapeName, int& series, int& records) {
     std::ifstream tape(tapeName, std::ios::binary);
     Record newRecord;
     series = 0;
@@ -32,7 +32,7 @@ void getInputInfo(std::string tapeName, int& series, int& records) {
     std::cout << std::endl;
 }
 
-void printTape(std::string tapeName, std::string displayName) {
+static void printTape(std::string tapeName, std::string displayName) {
     std::ifstream tape(tapeName, std::ios::binary);
     std::cout << std::endl << displayName << std::endl;
 
@@ -66,13 +66,13 @@ void printTape(std::string tapeName, std::string displayName) {
     tape.close();
 }
 
-void printTapes() {
+static void printTapes() {
     printTape(TAPE_A, "tape A");
     printTape(TAPE_B, "tape B");
     printTape(TAPE_C, "tape C");
 }
 
-void inputRecords(std::string tapeName) {
+static void inputRecords(std::string tapeName) {
     std::ofstream tape(tapeName, std::ios::binary);
     Record record;
     int n;
@@ -90,7 +90,7 @@ void inputRecords(std::string tapeName) {
     std::cout << n << " records written to " << tapeName << std::endl;
 }
 
-void generateRecords(std::string tapeName) {
+static void generateRecords(std::string tapeName) {
     std::ofstream tape(tapeName, std::ios::binary);
     Record record;
     int n;
@@ -106,7 +106,7 @@ void generateRecords(std::string tapeName) {
     std::cout << n << " records written to " << tapeName << std::endl;
 }
 
-void splitInputFile(std::string tapeA, std::string tapeB, std::string tapeC, int& seriesA, int& seriesB, int& reads, int& writes, bool display) {
+static void splitInputFile(std::string tapeA, std::string tapeB, std::string tapeC, int& seriesA, int& seriesB, int& reads, int& writes, bool display) {
     std::ifstream inFile(tapeC, std::ios::binary);
     Block input;
     input.inFile = &inFile;
@@ -177,7 +177,7 @@ void splitInputFile(std::string tapeA, std::string tapeB, std::string tapeC, int
     }
 }
 
-void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2) {
+static void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2) {
     Fibonacci fib;
 
     if (!fib.isFib(series1) && !fib.isFib(series2)) {
@@ -238,7 +238,7 @@ void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2
     }
 }
 
-void handleDummySeries(Block& input1, Block& input2, Block& output, int& series1, int& series2, int& seriesOut, int& dummies1, int& dummies2, int& reads, int& writes) {
+static void handleDummySeries(Block& input1, Block& input2, Block& output, int& series1, int& series2, int& seriesOut, int& dummies1, int& dummies2, int& reads, int& writes) {
     if (dummies1 == 0 && dummies2 == 0) {
         output.last = INFINITY;
         return;
@@ -281,7 +281,7 @@ void handleDummySeries(Block& input1, Block& input2, Block& output, int& series1
     }
 }
 
-bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut, int& seriesIn1, int& seriesIn2, int& seriesOut, int& reads, int& writes, int& phases, bool display) {
+static bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut, int& seriesIn1, int& seriesIn2, int& seriesOut, int& reads, int& writes, int& phases, bool display) {
     if (seriesIn1 == 0) {
         std::string tmpTape;
         tmpTape = tapeIn2;
@@ -470,7 +470,11 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
                 tmpFile.close();
                 inFile1.close();
                 std::remove(tapeIn1.c_str());
-                std::rename("tmp.bin", tapeIn1.c_str());
+                /*int begone_C6031 =*/ std::rename("tmp.bin", tapeIn1.c_str());
+                /*if (begone_C6031 != 0) {
+                    std::cout << std::endl << "Error renaming file" << std::endl;
+                    exit(1);
+                }*/
                 inFile2.close();
                 std::remove(tapeIn2.c_str());
                 std::ofstream tmpFile2(tapeIn2, std::ios::binary);
@@ -495,7 +499,11 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
                 tmpFile.close();
                 inFile2.close();
                 std::remove(tapeIn2.c_str());
-                std::rename("tmp.bin", tapeIn2.c_str());
+                /*int begone_C6031 =*/ std::rename("tmp.bin", tapeIn2.c_str());
+                /*if (begone_C6031 != 0) {
+                    std::cout << std::endl << "Error renaming file" << std::endl;
+                    exit(1);
+                }*/
                 inFile1.close();
                 std::remove(tapeIn1.c_str());
                 std::ofstream tmpFile1(tapeIn1, std::ios::binary);
@@ -550,7 +558,7 @@ bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& tapeOut
     exit(1);
 }
 
-void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC, bool display, bool printInOut) {
+static void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC, bool display, bool printInOut) {
     int reads = 0;
     int writes = 0;
     int phases = 0;
@@ -559,18 +567,18 @@ void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string tapeC,
     int seriesC = 0;
     int seriesInput = 0;
     int recordsInput = 0;
-    float time0 = 0.0;
+    double time0 = 0.0;
 
     getInputInfo(tapeC, seriesInput, recordsInput);
     int avgPhases = int(std::round(1.45 * log2(seriesInput)));
-    int avgReadsWrites = std::round(2.0 * recordsInput * (1.04 * log2(seriesInput) + 1) / BLOCK_SIZE);
+    int avgReadsWrites = int(std::round(2.0 * recordsInput * (1.04 * log2(seriesInput) + 1) / BLOCK_SIZE));
 
     if (printInOut) {
         printTape(tapeC, "Input file");
     }
 
     if (!display) {
-        time0 = clock();
+        time0 = double(clock());
     }
 
     splitInputFile(tapeA, tapeB, tapeC, seriesA, seriesB, reads, writes, display);
