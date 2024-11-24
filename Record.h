@@ -21,5 +21,4 @@ public:
     void product();
     void randomize();
     void readFromConsole();
-    Record compare(Record other) const;
 };

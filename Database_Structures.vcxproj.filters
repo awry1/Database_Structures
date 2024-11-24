@@ -39,4 +39,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="tapeA.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tapeB.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tapeC.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

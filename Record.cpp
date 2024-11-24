@@ -32,10 +32,8 @@ void Record::readFromFile(std::ifstream& file) {
 }
 
 void Record::product() {
-    Product = A + B - Sum;
-    if (std::abs(Product) < 1e-10) {
-        Product = 0.0;
-    }
+    Product = abs(A + B - Sum); // 0.47 + 0.42 - 0.89 = -0.00
+    Product = std::round(Product * 100) / 100.0;
 }
 
 void Record::randomize() {
@@ -58,14 +56,4 @@ void Record::readFromConsole() {
     std::cout << "Enter Sum: ";
     std::cin >> Sum;
     product();
-}
-
-Record Record::compare(Record other) const {
-    // Returns lesser record
-    if (Product < other.Product) {
-        return *this;
-    }
-    else {
-        return other;
-    }
 }
