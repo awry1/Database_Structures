@@ -13,9 +13,6 @@ Block::Block(std::vector<Record>& records) : records(records) {
     outFile = nullptr;
     last = INFINITY;
     series = 0;
-    while (this->records.size() < BLOCK_SIZE) {
-        this->records.push_back(Record());
-    }
 }
 
 void Block::print() const {
@@ -25,6 +22,10 @@ void Block::print() const {
 }
 
 void Block::writeToFile(std::ofstream& file, int& counter) {
+    if (records.empty()) {
+        return;
+    }
+
     for (int i = 0; i < records.size(); i++) {
         records[i].writeToFile(file);
     }

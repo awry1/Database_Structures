@@ -178,6 +178,12 @@ static void splitInputFile(std::string tapeA, std::string tapeB, std::string tap
 }
 
 static void calculateDummySeries(int series1, int series2, int& dummies1, int& dummies2) {
+    static bool first = true;
+    if (!first) {
+        return;
+    }
+    first = false;
+
     Fibonacci fib;
 
     if (!fib.isFib(series1) && !fib.isFib(series2)) {
@@ -203,7 +209,6 @@ static void calculateDummySeries(int series1, int series2, int& dummies1, int& d
         }
         std::cout << std::endl << "Series are Fibonacci numbers but not consecutive" << std::endl;
     }
-    // Add error handling
     if (!fib.isFib(series1)) {
         if (series1 > fib.next(series2)) {
             std::cout << std::endl << "Series 1 is too large" << std::endl;
@@ -248,11 +253,9 @@ static void handleDummySeries(Block& input1, Block& input2, Block& output, int& 
     int* series = (dummies1 > 0) ? &series2 : &series1;
     int* dummies = (dummies1 > 0) ? &dummies1 : &dummies2;
 
-    Fibonacci fib;
-
     bool eof = false;
     while (true) {
-        input->readFromFile(*input->inFile, reads);
+        eof = input->readFromFile(*input->inFile, reads);
         while (!input->isEmpty()) {
             Record record = input->first();
             if (record.Product < output.last) {
@@ -261,7 +264,8 @@ static void handleDummySeries(Block& input1, Block& input2, Block& output, int& 
                 *series -= 1;
                 *dummies -= 1;
                 if (*dummies == 0) {
-                    break;
+                    output.last = INFINITY;
+                    return;
                 }
             }
             if (output.isFull()) {
@@ -269,10 +273,6 @@ static void handleDummySeries(Block& input1, Block& input2, Block& output, int& 
             }
             output.records.push_back(input->pop());
             output.last = record.Product;
-        }
-        if (*dummies == 0) {
-            output.last = INFINITY;
-            break;
         }
         if (eof) {
             std::cout << std::endl << "Can't handle dummy series" << std::endl;
@@ -321,8 +321,6 @@ static bool mergeFiles(std::string& tapeIn1, std::string& tapeIn2, std::string& 
     Block output;
     output.outFile = &outFile;
     output.last = -INFINITY;
-
-    Fibonacci fib;
 
     int dummies1 = 0;
     int dummies2 = 0;
@@ -600,7 +598,7 @@ static void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string
         exit(1);
     }
 
-    if (!display && !printInOut) {
+    if (!display) {
         time0 = std::round((clock() - time0) / CLOCKS_PER_SEC * 100) / 100.0;
     }
 
@@ -616,7 +614,7 @@ static void polyphaseMergeSort(std::string tapeA, std::string tapeB, std::string
     std::cout << std::endl << "Theoretical phases: " << avgPhases;
     std::cout << std::endl << "Theoretical disk operations: " << avgReadsWrites;
     std::cout << std::endl;
-    if (!display && !printInOut) {
+    if (!display) {
         std::cout << std::endl << "Time: " << time0 << "s" << std::endl;
     }
 }
