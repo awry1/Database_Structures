@@ -1,6 +1,6 @@
 #pragma once
 #include "Record.h"
-constexpr auto BLOCK_SIZE = 100;
+constexpr auto BLOCK_SIZE = 20;
 
 class Block {
 public:

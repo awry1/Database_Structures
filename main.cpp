@@ -645,7 +645,7 @@ int main() {
         std::cout << "OK? (0/1): ";
         std::cin >> choice;
         if (choice == 0) {
-            std::cout << "Too bad" << std::endl;
+            std::cout << "Not supported" << std::endl;
             exit(1);
         }
         break;
