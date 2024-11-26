@@ -623,7 +623,7 @@ int main() {
     srand(unsigned int(time(NULL)));
     int choice;
     bool afterPhase;
-    bool printInOut = false;
+    bool printInOut = true;
 
     std::cout << "Polyphase merge sort" << std::endl;
     std::cout << "1. Generate records" << std::endl;
