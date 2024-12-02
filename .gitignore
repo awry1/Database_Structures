@@ -1,10 +1,12 @@
 *
 !/.gitignore
 !/.gitattributes
-!/*.sln
-!/*.vcxproj
-!/*.vcxproj.filters
-!/*.vcxproj.user
-!/*.h
-!/*.cpp
+!/Polyphase Merge Sort
+!/B-tree
+!/*/*.sln
+!/*/*.vcxproj
+!/*/*.vcxproj.filters
+!/*/*.vcxproj.user
+!/*/*.hpp
+!/*/*.cpp
 !/*.md

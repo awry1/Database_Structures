@@ -1,4 +1,4 @@
-#include "Fibonacci.h"
+#include "Fibonacci.hpp"
 
 Fibonacci::Fibonacci() {
     fib = { 0 };

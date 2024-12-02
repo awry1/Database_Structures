@@ -1,5 +1,5 @@
 #pragma once
-#include "Record.h"
+#include "Record.hpp"
 constexpr auto BLOCK_SIZE = 100;
 
 class Block {

@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{9ab55581-251d-49d5-a835-79e7d13128b8}</ProjectGuid>
-    <RootNamespace>DatabaseStructures</RootNamespace>
+    <ProjectGuid>{e7576cdc-8903-4761-b3f6-92ff6f8dce0f}</ProjectGuid>
+    <RootNamespace>Btree</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,20 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Block.h" />
-    <ClInclude Include="Fibonacci.h" />
-    <ClInclude Include="Record.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Block.cpp" />
-    <ClCompile Include="Fibonacci.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Record.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="tapeA.bin" />
-    <None Include="tapeB.bin" />
-    <None Include="tapeC.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

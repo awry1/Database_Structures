@@ -1,4 +1,4 @@
-#include "Record.h"
+#include "Record.hpp"
 
 // 2 zdarzenia - ich prawdopodobieństwa oraz prawdopodobieństwo sumy tych zdarzeń
 // Uporządkowanie wg prawdopodobieństwa iloczynu tych zdarzeń

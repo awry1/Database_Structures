@@ -1,5 +1,5 @@
-#include "Block.h"
-#include "Fibonacci.h"
+#include "Block.hpp"
+#include "Fibonacci.hpp"
 constexpr auto TAPE_A = "tapeA.bin";
 constexpr auto TAPE_B = "tapeB.bin";
 constexpr auto TAPE_C = "tapeC.bin";
