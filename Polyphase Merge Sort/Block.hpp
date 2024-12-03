@@ -1,4 +1,6 @@
 #pragma once
+#include <fstream>
+#include <vector>
 #include "Record.hpp"
 constexpr auto BLOCK_SIZE = 100;
 

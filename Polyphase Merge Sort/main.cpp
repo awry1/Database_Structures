@@ -1,5 +1,7 @@
+#include <iostream>
 #include "Block.hpp"
 #include "Fibonacci.hpp"
+#include "Record.hpp"
 constexpr auto TAPE_A = "tapeA.bin";
 constexpr auto TAPE_B = "tapeB.bin";
 constexpr auto TAPE_C = "tapeC.bin";

@@ -12,7 +12,7 @@ public:
     double Sum;
 
     Record();
-    Record(int key, double a, double b, double s);
+    Record(int k, double a, double b, double s);
 
     void print() const;
     void writeToFile(std::ofstream& file) const;

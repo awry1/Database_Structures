@@ -3,9 +3,9 @@
 // 2 zdarzenia - ich prawdopodobieństwa oraz prawdopodobieństwo sumy tych zdarzeń
 // Uporządkowanie wg klucza
 
-Record::Record() : key(0), A(0.0), B(0.0), Sum(0.0) {}
+Record::Record() : key(-1), A(0.0), B(0.0), Sum(0.0) {}
 
-Record::Record(int key, double a, double b, double s) : key(key), A(a), B(b), Sum(s) {}
+Record::Record(int k, double a, double b, double s) : key(k), A(a), B(b), Sum(s) {}
 
 void Record::print() const {
     std::cout << std::fixed << std::setprecision(2);
@@ -28,7 +28,6 @@ void Record::readFromFile(std::ifstream& file) {
 }
 
 void Record::randomize() {
-    key = rand();
     // Probability of event A and B
     A = (rand() % 100) / 100.0;
     B = (rand() % 100) / 100.0;

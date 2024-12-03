@@ -127,11 +127,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Btree.cpp" />
+    <ClCompile Include="Element.cpp" />
+    <ClCompile Include="KeyGen.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="Record.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Btree.hpp" />
+    <ClInclude Include="Element.hpp" />
+    <ClInclude Include="KeyGen.hpp" />
+    <ClInclude Include="Node.hpp" />
     <ClInclude Include="Record.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pages.bin" />
+    <None Include="records.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
