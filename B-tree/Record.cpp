@@ -7,24 +7,24 @@ Record::Record() : key(-1), A(0.0), B(0.0), Sum(0.0) {}
 
 Record::Record(int k, double a, double b, double s) : key(k), A(a), B(b), Sum(s) {}
 
-void Record::print() const {
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << key << " -> ";
-    std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
-}
-
-void Record::writeToFile(std::ofstream& file) const {
+void Record::writeToFile(std::fstream& file) const {
     file.write(reinterpret_cast<const char*>(&key), sizeof(key));
     file.write(reinterpret_cast<const char*>(&A), sizeof(A));
     file.write(reinterpret_cast<const char*>(&B), sizeof(B));
     file.write(reinterpret_cast<const char*>(&Sum), sizeof(Sum));
 }
 
-void Record::readFromFile(std::ifstream& file) {
+void Record::readFromFile(std::fstream& file) {
     file.read(reinterpret_cast<char*>(&key), sizeof(key));
     file.read(reinterpret_cast<char*>(&A), sizeof(A));
     file.read(reinterpret_cast<char*>(&B), sizeof(B));
     file.read(reinterpret_cast<char*>(&Sum), sizeof(Sum));
+}
+
+void Record::print() const {
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << key << " -> ";
+    std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
 }
 
 void Record::randomize() {
@@ -46,4 +46,5 @@ void Record::readFromConsole() {
     std::cin >> B;
     std::cout << "Enter Sum: ";
     std::cin >> Sum;
+    std::cin.ignore();
 }

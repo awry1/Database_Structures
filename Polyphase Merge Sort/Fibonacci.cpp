@@ -4,20 +4,6 @@ Fibonacci::Fibonacci() {
     fib = { 0 };
 }
 
-void Fibonacci::reset() {
-    fib = { 0 };
-}
-
-void Fibonacci::restore(int n) {
-    // Ensures next() = n
-    while (fib.back() > n) {
-        fib.pop_back();
-    }
-    while (fib.back() < n) {
-        next();
-    }
-}
-
 int Fibonacci::next() {
     if (fib.size() > 2) {
         fib.push_back(fib[fib.size() - 1] + fib[fib.size() - 2]);
@@ -57,4 +43,18 @@ int Fibonacci::closestFib(int n) {
 
 bool Fibonacci::isFib(int n) {
     return closestFib(n) == n;
+}
+
+void Fibonacci::reset() {
+    fib = { 0 };
+}
+
+void Fibonacci::restore(int n) {
+    // Ensures next() = n
+    while (fib.back() > n) {
+        fib.pop_back();
+    }
+    while (fib.back() < n) {
+        next();
+    }
 }

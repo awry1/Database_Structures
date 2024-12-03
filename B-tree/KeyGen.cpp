@@ -10,6 +10,8 @@ KeyGen::KeyGen() {
         keys[i] = keys[j];
         keys[j] = temp;
     }
+    initialSize = INT_MAX;
+    succeedingKey = INT_MAX;
 }
 
 KeyGen::KeyGen(int n) {
@@ -22,13 +24,28 @@ KeyGen::KeyGen(int n) {
         keys[i] = keys[j];
         keys[j] = temp;
     }
+    initialSize = n;
+    succeedingKey = n;
 }
 
 int KeyGen::nextKey(){
     if (keys.empty()) {
-        return -1;
+        addKeys();
     }
     int key = keys.back();
     keys.pop_back();
     return key;
+}
+
+void KeyGen::addKeys() {
+    for (int i = 0; i < initialSize; i++) {
+        keys.push_back(i + succeedingKey);
+    }
+    for (int i = 0; i < initialSize; i++) {
+        int j = rand() % initialSize;
+        int temp = keys[i];
+        keys[i] = keys[j];
+        keys[j] = temp;
+    }
+    succeedingKey += initialSize;
 }

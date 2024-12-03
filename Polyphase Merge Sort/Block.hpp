@@ -15,14 +15,15 @@ public:
     Block();
     Block(std::vector<Record>& records);
 
-    void print() const;
     void writeToFile(std::ofstream& file, int& counter);
     bool readFromFile(std::ifstream& file, int& counter);
+    void print() const;
 
     void clear();
+    int size() const;
     bool isEmpty() const;
     bool isFull() const;
-    int size() const;
+
     Record first();
     Record pop();
 };

@@ -15,12 +15,6 @@ Block::Block(std::vector<Record>& records) : records(records) {
     series = 0;
 }
 
-void Block::print() const {
-    for (int i = 0; i < records.size(); i++) {
-        records[i].print();
-    }
-}
-
 void Block::writeToFile(std::ofstream& file, int& counter) {
     if (records.empty()) {
         return;
@@ -57,8 +51,18 @@ bool Block::readFromFile(std::ifstream& file, int& counter) {
     return eof;
 }
 
+void Block::print() const {
+    for (int i = 0; i < records.size(); i++) {
+        records[i].print();
+    }
+}
+
 void Block::clear() {
     records.clear();
+}
+
+int Block::size() const {
+    return int(records.size());
 }
 
 bool Block::isEmpty() const {
@@ -67,10 +71,6 @@ bool Block::isEmpty() const {
 
 bool Block::isFull() const {
     return (records.size() == BLOCK_SIZE);
-}
-
-int Block::size() const {
-    return int(records.size());
 }
 
 Record Block::first() {

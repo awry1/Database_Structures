@@ -11,12 +11,6 @@ Record::Record(double a, double b, double s) : A(a), B(b), Sum(s) {
     product();
 }
 
-void Record::print() const {
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << Product << " -> ";
-    std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
-}
-
 void Record::writeToFile(std::ofstream& file) const {
     file.write(reinterpret_cast<const char*>(&A), sizeof(A));
     file.write(reinterpret_cast<const char*>(&B), sizeof(B));
@@ -28,6 +22,12 @@ void Record::readFromFile(std::ifstream& file) {
     file.read(reinterpret_cast<char*>(&B), sizeof(B));
     file.read(reinterpret_cast<char*>(&Sum), sizeof(Sum));
     product();
+}
+
+void Record::print() const {
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << Product << " -> ";
+    std::cout << "(" << A << ", " << B << ", " << Sum << ")" << std::endl;
 }
 
 void Record::product() {

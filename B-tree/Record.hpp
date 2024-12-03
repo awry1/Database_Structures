@@ -14,9 +14,9 @@ public:
     Record();
     Record(int k, double a, double b, double s);
 
+    void writeToFile(std::fstream& file) const;
+    void readFromFile(std::fstream& file);
     void print() const;
-    void writeToFile(std::ofstream& file) const;
-    void readFromFile(std::ifstream& file);
 
     void randomize();
     void readFromConsole();

@@ -5,7 +5,7 @@
 #include "KeyGen.hpp"
 
 static void getInputInfo(std::string fileName, int& records) {
-    std::ifstream file(fileName, std::ios::binary);
+    std::fstream file(fileName, std::ios::binary);
     Record newRecord;
     records = 0;
     while (true) {
@@ -25,7 +25,7 @@ static void getInputInfo(std::string fileName, int& records) {
 }
 
 static void printFile(std::string fileName, std::string displayName) {
-    std::ifstream file(fileName, std::ios::binary);
+    std::fstream file(fileName, std::ios::binary);
     std::cout << std::endl << displayName << std::endl;
 
     int records = 0;
@@ -50,28 +50,8 @@ static void printFile(std::string fileName, std::string displayName) {
     file.close();
 }
 
-static void inputRecords(std::string fileName) {
-    // TODO: add creation of elements while generating records
-    std::ofstream file(fileName, std::ios::binary);
-    Record record;
-    int n;
-
-    std::cout << "Enter number of records: ";
-    std::cin >> n;
-    std::cin.ignore();
-    for (int i = 0; i < n; i++) {
-        std::cout << "Record " << i + 1 << std::endl;
-        record.readFromConsole();
-        record.print();
-        record.writeToFile(file);
-    }
-    file.close();
-    std::cout << n << " records written to " << fileName << std::endl;
-}
-
 static void generateRecords(std::string fileName) {
-    // TODO: add creation of elements while generating records
-    std::ofstream file(fileName, std::ios::binary);
+    std::fstream file(fileName, std::ios::binary);
     Record record;
     int n;
 
@@ -88,16 +68,56 @@ static void generateRecords(std::string fileName) {
     std::cout << n << " records written to " << fileName << std::endl;
 }
 
+void printMenu() {
+    std::cout << std::endl;
+    std::cout << "1. Find record" << std::endl;
+    std::cout << "2. Insert record" << std::endl;
+    std::cout << "3. Update record" << std::endl;
+    std::cout << "4. Delete record" << std::endl;
+    std::cout << "5. Print tree" << std::endl;
+    std::cout << "6. Exit" << std::endl;
+    std::cout << std::endl;
+}
+
+void programLoop() {
+    Btree btree;
+
+    int choice;
+    while (true) {
+        printMenu();
+        std::cout << "Enter choice: ";
+        std::cin >> choice;
+        std::cin.ignore();
+        switch (choice) {
+        case 1:
+            btree.findRecord();
+            break;
+        case 2:
+            btree.insertRecord();
+            break;
+        case 3:
+            btree.updateRecord();
+            break;
+        case 4:
+            btree.deleteRecord();
+            break;
+        case 5:
+            btree.printTree();
+            break;
+        case 6:
+            exit(0);
+            break;
+        default:
+            std::cout << "Invalid choice" << std::endl;
+            break;
+        }
+    }
+}
+
 int main() {
     srand(unsigned int(time(NULL)));
 
-    generateRecords("records.bin");
-    int records = 0;
-    getInputInfo("records.bin", records);
-    int offset = 0;
-    for (int i = 0; i < records; i++) {
-        Element element(i, offset);
-        element.print();
-        offset += RECORD_SIZE;
-    }
+    //programLoop();
+
+    Btree btree;
 }

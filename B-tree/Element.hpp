@@ -8,12 +8,14 @@ constexpr auto RECORD_SIZE = sizeof(int) + 3 * sizeof(double);
 class Element {
 public:
     int key;
-    int offset; // offset of the record in the file
+    int offset; // Record offset in records.bin
 
     Element();
     Element(int key, int offset);
 
-    Record readFromFile() const;
-
+    void writeToFile(std::fstream& file) const;
+    void readFromFile(std::fstream& file);
     void print() const;
+
+    void update(Record record) const;
 };
