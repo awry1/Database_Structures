@@ -1,8 +1,8 @@
 #include "Element.hpp"
 
-Element::Element() : key(-1), offset(-1) {}
+Element::Element() : key(-1), offset(-1), parent(nullptr) {}
 
-Element::Element(int key, int offset) : key(key), offset(offset) {}
+Element::Element(int key, int offset) : key(key), offset(offset), parent(nullptr) {}
 
 void Element::writeToFile(std::fstream& file) const {
     file.write(reinterpret_cast<const char*>(&key), sizeof(key));
@@ -15,7 +15,7 @@ void Element::readFromFile(std::fstream& file) {
 }
 
 void Element::print() const {
-    std::fstream file(RECORDS_FILE, std::ios::binary);
+    std::fstream file(RECORDS_FILE, std::ios::binary | std::ios::in | std::ios::out);
     file.seekg(offset);
     Record record;
     record.readFromFile(file);
@@ -28,4 +28,8 @@ void Element::update(Record record) const {
     file.seekp(offset);
     record.writeToFile(file);
     file.close();
+}
+
+bool Element::isNull() const {
+    return key == -1;
 }
