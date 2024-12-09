@@ -17,11 +17,14 @@ public:
 
     Node();
     Node(int offset);
+    ~Node();
 
     void writeToFile() const;
     void readFromFile();
     void print() const;
 
-    bool isFull() const;
     bool isLeaf() const;
+    bool isFull() const;
+    bool isOverflown() const;
+    bool isUnderflown() const;
 };

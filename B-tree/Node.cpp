@@ -10,6 +10,10 @@ Node::Node(int offset) : offset(offset), parent(nullptr) {
     children = std::vector<int>();
 }
 
+Node::~Node() {
+    std::cout << "Node " << offset << " deleted" << std::endl;
+}
+
 void Node::writeToFile() const {
     std::fstream file(PAGES_FILE, std::ios::binary | std::ios::in | std::ios::out);
     file.seekp(offset);
@@ -63,10 +67,18 @@ void Node::print() const {
     std::cout << "]";
 }
 
+bool Node::isLeaf() const {
+    return children.empty();
+}
+
 bool Node::isFull() const {
     return elements.size() == MAX_ELEMENTS;
 }
 
-bool Node::isLeaf() const {
-    return children.empty();
+bool Node::isOverflown() const {
+    return elements.size() > MAX_ELEMENTS;
+}
+
+bool Node::isUnderflown() const {
+    return elements.size() < MIN_ELEMENTS;
 }

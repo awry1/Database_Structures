@@ -68,14 +68,24 @@
 //    std::cout << n << " records written to " << fileName << std::endl;
 //}
 
+void clearConsole() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 void printMenu() {
     std::cout << std::endl;
     std::cout << "1. Find record" << std::endl;
     std::cout << "2. Insert record" << std::endl;
     std::cout << "3. Update record" << std::endl;
     std::cout << "4. Delete record" << std::endl;
-    std::cout << "5. Print tree" << std::endl;
-    std::cout << "6. Exit" << std::endl;
+    std::cout << "5. Print tree (BFS)" << std::endl;
+    std::cout << "6. Print tree (In Order)" << std::endl;
+    std::cout << "7. Print tree" << std::endl;
+    std::cout << "0. Exit" << std::endl;
     std::cout << std::endl;
 }
 
@@ -105,6 +115,13 @@ void programLoop() {
             btree.printBFS();
             break;
         case 6:
+            btree.printInOrder();
+            break;
+        case 7:
+            btree.printTree();
+            break;
+        case 0:
+            btree.deleteTree();
             exit(0);
             break;
         default:
@@ -117,30 +134,32 @@ void programLoop() {
 int main() {
     srand(unsigned int(time(NULL)));
 
-    Btree btree;
-    Record record(1, 0.5, 0.2, 0.3);
-    std::cout << "Record: ";
-    record.print();
-    std::fstream file(RECORDS_FILE, std::ios::binary | std::ios::in | std::ios::out);
-    record.writeToFile(file);
-    file.close();
-    Element element(1, 0);
-    std::cout << "Element: ";
-    element.print();
-    btree.root.elements.push_back(element);
-    std::cout << "Node: ";
-    btree.root.print();
-    std::cout << " ";
-    btree.findRecord(1);
-    btree.updateRecord();
-    std::cout << "Find record 1: ";
-    btree.findRecord(1);
-    std::cout << "Find record 0: ";
-    btree.findRecord(0);
-    std::cout << "Delete record 0: ";
-    btree.deleteRecord(0);
-    std::cout << "Delete record 1: ";
-    btree.deleteRecord(1);  // TODO
-    std::cout << "Find record 1: ";
-    btree.findRecord(1);
+    //Btree btree;
+    //Record record(1, 0.5, 0.2, 0.3);
+    //std::cout << "Record: ";
+    //record.print();
+    //std::fstream file(RECORDS_FILE, std::ios::binary | std::ios::in | std::ios::out);
+    //record.writeToFile(file);
+    //file.close();
+    //Element element(1, 0);
+    //std::cout << "Element: ";
+    //element.print();
+    //btree.root.elements.push_back(element);
+    //std::cout << "Node: ";
+    //btree.root.print();
+    //std::cout << " ";
+    //btree.findRecord(1);
+    //btree.updateRecord();
+    //std::cout << "Find record 1: ";
+    //btree.findRecord(1);
+    //std::cout << "Find record 0: ";
+    //btree.findRecord(0);
+    //std::cout << "Delete record 0: ";
+    //btree.deleteRecord(0);
+    //std::cout << "Delete record 1: ";
+    //btree.deleteRecord(1);  // TODO
+    //std::cout << "Find record 1: ";
+    //btree.findRecord(1);
+
+    programLoop();
 }
