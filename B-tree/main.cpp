@@ -1,8 +1,8 @@
-#include <iostream>
 #include "Btree.hpp"
-#include "Node.hpp"
 #include "Element.hpp"
 #include "KeyGen.hpp"
+#include "Node.hpp"
+#include <iostream>
 
 //static void getInputInfo(std::string fileName, int& records) {
 //    std::fstream file(fileName, std::ios::binary);
@@ -82,9 +82,8 @@ void printMenu() {
     std::cout << "2. Insert record" << std::endl;
     std::cout << "3. Update record" << std::endl;
     std::cout << "4. Delete record" << std::endl;
-    std::cout << "5. Print tree (BFS)" << std::endl;
-    std::cout << "6. Print tree (In Order)" << std::endl;
-    std::cout << "7. Print tree" << std::endl;
+    std::cout << "5. Print tree structure" << std::endl;
+    std::cout << "6. Print records in order" << std::endl;
     std::cout << "0. Exit" << std::endl;
     std::cout << std::endl;
 }
@@ -112,13 +111,10 @@ void programLoop() {
             btree.deleteRecord();
             break;
         case 5:
-            btree.printBFS();
+            btree.printTree();
             break;
         case 6:
             btree.printInOrder();
-            break;
-        case 7:
-            btree.printTree();
             break;
         case 0:
             btree.deleteTree();
@@ -131,35 +127,79 @@ void programLoop() {
     }
 }
 
+void examplePrint() {
+
+    Record record0(0, 0.5, 0.2, 0.3);
+    Element element0(0, 0 * sizeof(Record));
+    element0.update(record0);
+
+    Record record1(1, 0.5, 0.2, 0.3);
+    Element element1(1, 1 * sizeof(Record));
+    element1.update(record1);
+
+    Record record2(2, 0.5, 0.2, 0.3);
+    Element element2(2, 2 * sizeof(Record));
+    element2.update(record2);
+
+    Record record3(3, 0.5, 0.2, 0.3);
+    Element element3(3, 3 * sizeof(Record));
+    element3.update(record3);
+
+    Record record4(4, 0.5, 0.2, 0.3);
+    Element element4(4, 4 * sizeof(Record));
+    element4.update(record4);
+
+    Record record5(5, 0.5, 0.2, 0.3);
+    Element element5(5, 5 * sizeof(Record));
+    element5.update(record5);
+
+    Record record6(6, 0.5, 0.2, 0.3);
+    Element element6(6, 6 * sizeof(Record));
+    element6.update(record6);
+
+    Btree btree;
+    btree.root->elements.push_back(element3);
+    btree.root->children.push_back(1 * sizeof(Node));
+    btree.root->children.push_back(2 * sizeof(Node));
+    btree.root->writeToFile();
+
+    Node child1(1 * sizeof(Node));
+    child1.elements.push_back(element1);
+    child1.children.push_back(3 * sizeof(Node));
+    child1.children.push_back(4 * sizeof(Node));
+    child1.writeToFile();
+
+    Node child2(2 * sizeof(Node));
+    child2.elements.push_back(element5);
+    child2.children.push_back(5 * sizeof(Node));
+    child2.children.push_back(6 * sizeof(Node));
+    child2.writeToFile();
+
+    Node child3(3 * sizeof(Node));
+    child3.elements.push_back(element0);
+    child3.writeToFile();
+
+    Node child4(4 * sizeof(Node));
+    child4.elements.push_back(element2);
+    child4.writeToFile();
+
+    Node child5(5 * sizeof(Node));
+    child5.elements.push_back(element4);
+    child5.writeToFile();
+
+    Node child6(6 * sizeof(Node));
+    child6.elements.push_back(element6);
+    child6.writeToFile();
+
+    btree.printTree();
+    btree.printTreeReverse();
+    btree.deleteTree();
+}
+
 int main() {
     srand(unsigned int(time(NULL)));
 
-    //Btree btree;
-    //Record record(1, 0.5, 0.2, 0.3);
-    //std::cout << "Record: ";
-    //record.print();
-    //std::fstream file(RECORDS_FILE, std::ios::binary | std::ios::in | std::ios::out);
-    //record.writeToFile(file);
-    //file.close();
-    //Element element(1, 0);
-    //std::cout << "Element: ";
-    //element.print();
-    //btree.root.elements.push_back(element);
-    //std::cout << "Node: ";
-    //btree.root.print();
-    //std::cout << " ";
-    //btree.findRecord(1);
-    //btree.updateRecord();
-    //std::cout << "Find record 1: ";
-    //btree.findRecord(1);
-    //std::cout << "Find record 0: ";
-    //btree.findRecord(0);
-    //std::cout << "Delete record 0: ";
-    //btree.deleteRecord(0);
-    //std::cout << "Delete record 1: ";
-    //btree.deleteRecord(1);  // TODO
-    //std::cout << "Find record 1: ";
-    //btree.findRecord(1);
+    //programLoop();
 
-    programLoop();
+    examplePrint();
 }

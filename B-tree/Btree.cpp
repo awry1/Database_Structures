@@ -5,8 +5,21 @@ Btree::Btree() {
     freeNodes = std::vector<int>();
     freeRecords = std::vector<int>();
     records = 0;
+    nodes = 0;
 
     root = new Node(0);
+
+    // Chceck if 2 neccessary files exist, if not, create them
+    std::fstream file1(PAGES_FILE, std::ios::binary | std::ios::in | std::ios::out);
+    if (!file1.is_open()) {
+        file1.open(PAGES_FILE, std::ios::binary | std::ios::out);
+        file1.close();
+    }
+    std::fstream file2(RECORDS_FILE, std::ios::binary | std::ios::in | std::ios::out);
+    if (!file2.is_open()) {
+        file2.open(RECORDS_FILE, std::ios::binary | std::ios::out);
+        file2.close();
+    }
 }
 
 void Btree::findRecord() {
@@ -41,53 +54,57 @@ void Btree::deleteRecord() {
     deleteRecord(key);
 }
 
-void Btree::printBFS() {
-    std::cout << "Printing tree (BFS)" << std::endl;
-    std::queue<Node*> queue;
-    queue.push(root);
-    Node* parent = nullptr;
-    while (!queue.empty()) {
-        Node* node = queue.front();
-        queue.pop();
-        if (node->parent != parent) {
-            std::cout << std::endl;
-            parent = node->parent;
-            std::cout << "Parent: ";
-            parent->print();
-        }
-        node->print();
-        for (int child : node->children) {
-            Node* childNode = new Node(child);
-            loadedNodes.push_back(childNode);
-            childNode->readFromFile();
-            childNode->parent = node;
-            queue.push(childNode);
-        }
-    }
-    std::cout << std::endl;
-    unloadNodes();
-}
-
 void Btree::printInOrder() {
     std::cout << "Printing tree (in order)" << std::endl;
 }
 
 void Btree::printTree() {
     std::cout << "Printing tree" << std::endl;
-    print(root); // Will check later if it works
+    print(root);
+    std::cout << std::endl;
+}
+
+void Btree::printTreeReverse() {
+    std::cout << "Printing tree" << std::endl;
+    printReverse(root);
     std::cout << std::endl;
 }
 
 void Btree::print(Node* node, const std::string& prefix, bool isLast) {
-    std::cout << prefix << (isLast ? "└── " : "├── ");
+    if (node != root) {
+        std::cout << prefix << (isLast ? "└──" : "├──");
+    }
     node->print();
-    std::string newPrefix = prefix + (isLast ? "    " : "│   ");
+    std::cout << std::endl;
+    std::string newPrefix = prefix;
+    if (node != root) {
+        newPrefix += (isLast ? "    " : "│   ");
+    }
     for (int i = 0; i < node->children.size(); i++) {
         Node* child = new Node(node->children[i]);
         loadedNodes.push_back(child);
         child->readFromFile();
         child->parent = node;
         print(child, newPrefix, i == node->children.size() - 1);
+    }
+}
+
+void Btree::printReverse(Node* node, const std::string& prefix, bool isLast) {
+    if (node != root) {
+        std::cout << prefix << (isLast ? "└──" : "├──");
+    }
+    node->print();
+    std::cout << std::endl;
+    std::string newPrefix = prefix;
+    if (node != root) {
+        newPrefix += (isLast ? "    " : "│   ");
+    }
+    for (int i = node->children.size() - 1; i >= 0; i--) {
+        Node* child = new Node(node->children[i]);
+        loadedNodes.push_back(child);
+        child->readFromFile();
+        child->parent = node;
+        printReverse(child, newPrefix, i == 0);
     }
 }
 
@@ -190,7 +207,7 @@ void Btree::deleteRecord(int key) {
         std::cout << "key " << key << " deleted" << std::endl; // WIP
     }
     else {
-        std::cout << "key " << key<< " not found" << std::endl;
+        std::cout << "key " << key << " not found" << std::endl;
     }
 }
 
@@ -236,6 +253,7 @@ void Btree::unloadNodes() {
 }
 
 void Btree::deleteTree() {
+    std::cout << "Deleting tree" << std::endl;
     unloadNodes();
     delete(root);
 }

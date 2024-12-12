@@ -1,7 +1,7 @@
 #pragma once
+#include "Node.hpp"
 #include <queue>
 #include <vector>
-#include "Node.hpp"
 
 class Btree {
 public:
@@ -10,6 +10,7 @@ public:
     std::vector<int> freeNodes; // Deleted nodes offsets in pages.bin
     std::vector<int> freeRecords; // Deleted records offsets in records.bin
     int records; // Number of records in records.bin
+    int nodes; // Number of nodes in pages.bin
 
     Btree();
 
@@ -17,10 +18,11 @@ public:
     void insertRecord();
     void updateRecord();
     void deleteRecord();
-    void printBFS();
     void printInOrder();
     void printTree();
-    void print(Node* node, const std::string& prefix = "", bool isLast = true);
+    void printTreeReverse();
+    void print(Node* node, const std::string& prefix = " ", bool isLast = true);
+    void printReverse(Node* node, const std::string& prefix = " ", bool isLast = true);
 
     Node* findNode(int key);
 

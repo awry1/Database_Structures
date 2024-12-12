@@ -11,7 +11,7 @@ Node::Node(int offset) : offset(offset), parent(nullptr) {
 }
 
 Node::~Node() {
-    std::cout << "Node " << offset << " deleted" << std::endl;
+    //std::cout << "Node " << offset << " deleted" << std::endl;
 }
 
 void Node::writeToFile() const {

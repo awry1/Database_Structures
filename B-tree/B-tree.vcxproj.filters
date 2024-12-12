@@ -52,10 +52,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="records.bin">
+    <None Include="pages.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="pages.bin">
+    <None Include="records.bin">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
