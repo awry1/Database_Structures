@@ -1,6 +1,6 @@
 #include "Btree.hpp"
 
-Btree::Btree() {
+Btree::Btree(bool display) : display(display) {
     loadedNodes = std::vector<Node*>();
     freeNodes = std::vector<int>();
     freeRecords = std::vector<int>();
@@ -27,6 +27,9 @@ void Btree::insertRecord() {
     Record record;
     record.readFromConsole();
     insertRecord(record);
+    if (display) {
+        printTree();
+    }
 }
 
 void Btree::updateRecord() {
@@ -43,6 +46,9 @@ void Btree::deleteRecord() {
     std::cin >> key;
     std::cin.ignore();
     deleteRecord(key);
+    if (display) {
+        printTree();
+    }
 }
 
 void Btree::printRecord() {
@@ -55,16 +61,14 @@ void Btree::printRecord() {
 }
 
 void Btree::printTree() {
-    std::cout << "Printing tree" << std::endl;
     print(root);
     //printReverse(root);
     std::cout << std::endl;
 }
 
 void Btree::printAllRecords() {
-    std::cout << "Printing recordss in order" << std::endl;
-    
     printALL(root);
+    std::cout << std::endl;
 }
 
 Node* Btree::findNode(int key) {
@@ -150,11 +154,54 @@ void Btree::updateRecord(Record record) {
     }
 }
 
+void Btree::deleteElement(Element element) {
+    Node* node = element.parent;
+    int i = 0;
+    while (i < node->elements.size() && element.key != node->elements[i].key) {
+        i++;
+    }
+    if (!node->isLeaf()) {
+        Node* child = new Node(node->children[i]);
+        loadedNodes.push_back(child);
+        child->readFromFile();
+        child->parent = node;
+        while (!child->isLeaf()) {
+            Node* nextChild = new Node(child->children.back());
+            loadedNodes.push_back(nextChild);
+            nextChild->readFromFile();
+            nextChild->parent = child;
+            child = nextChild;
+        }
+        Element predecessor = child->elements.back();
+        child->elements.pop_back();
+        node->elements[i] = predecessor;
+        node->writeToFile();
+        
+        if (child->isUnderflown()) {
+            fixup(child);
+        }
+        else {
+            child->writeToFile();
+        }
+    }
+    else {
+        node->elements.erase(node->elements.begin() + i);
+        if (node->isUnderflown()) {
+            fixup(node);
+        }
+        else {
+            node->writeToFile();
+        }
+    }
+    unloadNodes();
+    std::cout << "key " << element.key << " deleted" << std::endl;
+}
+
 void Btree::deleteRecord(int key) {
     Element element = findElement(key);
     if (!element.isNull()) {
-        // deleteElement(element)
-        std::cout << "key " << key << " deleted" << std::endl; // WIP
+        freeRecords.push_back(element.offset);
+        deleteElement(element);
     }
     else {
         std::cout << "key " << key << " not found" << std::endl;
@@ -189,10 +236,8 @@ void Btree::fixup(Node* node) {
             fixUnderflow(node, leftSibling, rightSibling, i);
         }
     }
-    else {
-        if (node->isOverflown()) {
-            split(node);
-        }
+    else if (node->isOverflown()) {
+        split(node);
     }
 }
 
@@ -234,6 +279,40 @@ void Btree::fixOverflow(Node* node, Node* left, Node* right, int index) {
 }
 
 void Btree::fixUnderflow(Node* node, Node* left, Node* right, int index) {
+    if (left != nullptr && left->canGive()) {
+        right = node;
+        index--;
+    }
+    else if (right != nullptr && right->canGive()) {
+        left = node;
+    }
+    else {
+        merge(node, left, right, index);
+        return;
+    }
+
+    Node* parent = node->parent;
+
+    std::vector <Element> elements;
+    std::vector<int> children;
+    elements.insert(elements.end(), left->elements.begin(), left->elements.end());
+    elements.insert(elements.end(), parent->elements[index]);
+    elements.insert(elements.end(), right->elements.begin(), right->elements.end());
+    children.insert(children.end(), left->children.begin(), left->children.end());
+    children.insert(children.end(), right->children.begin(), right->children.end());
+
+    int mid = elements.size() / 2;
+    parent->elements[index] = elements[mid];
+    left->elements = std::vector<Element>(elements.begin(), elements.begin() + mid);
+    right->elements = std::vector<Element>(elements.begin() + mid + 1, elements.end());
+    if (!left->isLeaf()) {
+        left->children = std::vector<int>(children.begin(), children.begin() + mid + 1);
+        right->children = std::vector<int>(children.begin() + mid + 1, children.end());
+    }
+
+    left->writeToFile();
+    right->writeToFile();
+    parent->writeToFile();
 }
 
 void Btree::split(Node* node) {
@@ -299,8 +378,59 @@ void Btree::split(Node* node) {
         parent->elements.push_back(middle);
         parent->children.push_back(node->offset);
         parent->children.push_back(sibling->offset);
+        parent->parent = nullptr;
         parent->writeToFile();
         root = parent;
+    }
+}
+
+void Btree::merge(Node* node, Node* left, Node* right, int index) {
+    Node* parent = node->parent;
+    if (index == 0) {
+        left = node;
+    }
+    else {
+        right = node;
+        index--;
+    }
+
+    std::vector <Element> elements;
+    std::vector<int> children;
+    elements.insert(elements.end(), left->elements.begin(), left->elements.end());
+    elements.insert(elements.end(), parent->elements[index]);
+    elements.insert(elements.end(), right->elements.begin(), right->elements.end());
+    children.insert(children.end(), left->children.begin(), left->children.end());
+    children.insert(children.end(), right->children.begin(), right->children.end());
+
+    left->elements = elements;
+    if (!left->isLeaf()) {
+        left->children = children;
+    }
+    freeNodes.push_back(right->offset);
+
+    parent->elements.erase(parent->elements.begin() + index);
+    parent->children.erase(parent->children.begin() + index + 1);
+    if (parent->isEmpty()) {
+        freeNodes.push_back(left->offset);
+        left->offset = 0;
+        left->parent = nullptr;
+        for (int i = 0; i < loadedNodes.size(); i++) {
+            if (loadedNodes[i] == left) {
+                loadedNodes.erase(loadedNodes.begin() + i);
+                break;
+            }
+        }
+        root = left;
+        root->writeToFile();
+    }
+    else {
+        left->writeToFile();
+        if (parent->isUnderflown()) {
+            fixup(parent);
+        }
+        else {
+            parent->writeToFile();
+        }
     }
 }
 
@@ -377,7 +507,6 @@ void Btree::printALL(Node* node) {
 }
 
 void Btree::clearFiles() {
-    std::cout << "Tree emptied" << std::endl;
     std::fstream file1(PAGES_FILE, std::ios::binary | std::ios::out);
     root->elements.clear();
     root->children.clear();
@@ -389,7 +518,7 @@ void Btree::clearFiles() {
 
 void Btree::unloadNodes() {
     while (!loadedNodes.empty()) {
-        delete(loadedNodes.back());
+        delete loadedNodes.back();
         loadedNodes.pop_back();
     }
 }

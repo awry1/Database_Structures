@@ -26,6 +26,7 @@ public:
     bool isLeaf() const;
     bool isMin() const;
     bool isMax() const;
+    bool isEmpty() const;
     bool canGive() const;
     bool canReceive() const;
     bool isOverflown() const;

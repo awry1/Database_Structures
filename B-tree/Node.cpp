@@ -79,6 +79,10 @@ bool Node::isMax() const {
     return elements.size() == MAX_ELEMENTS;
 }
 
+bool Node::isEmpty() const {
+    return elements.empty();
+}
+
 bool Node::canGive() const {
     return elements.size() > MIN_ELEMENTS;
 }

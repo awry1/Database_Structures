@@ -10,8 +10,9 @@ public:
     std::vector<Node*> loadedNodes; // Loaded nodes
     std::vector<int> freeNodes; // Deleted nodes offsets in pages.bin
     std::vector<int> freeRecords; // Deleted records offsets in records.bin
+    bool display;
 
-    Btree();
+    Btree(bool display);
 
     void insertRecord();
     void updateRecord();
@@ -24,17 +25,18 @@ public:
 
     Element findElement(int key);
     void insertElement(Element element);
+    void deleteElement(Element element);
 
     void insertRecord(Record record);
     void updateRecord(Record record);
-    void deleteRecord(int key); // TODO
+    void deleteRecord(int key);
 
     void fixup(Node* node);
     void fixOverflow(Node* node, Node* left, Node* right, int index);
-    void fixUnderflow(Node* node, Node* left, Node* right, int index); // TODO
+    void fixUnderflow(Node* node, Node* left, Node* right, int index);
 
     void split(Node* node);
-    void merge(); // TODO
+    void merge(Node* node, Node* left, Node* right, int index);
 
     void printRecord(int key);
     void print(Node* node, const std::string& prefix = " ", bool isLast = true);
