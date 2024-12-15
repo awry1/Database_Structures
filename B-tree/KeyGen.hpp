@@ -7,8 +7,7 @@ public:
     int initialSize;
     int succeedingKey;
 
-    KeyGen();
-    KeyGen(int n);
+    KeyGen(int n, bool random);
 
     int nextKey();
     void addKeys();

@@ -1,31 +1,17 @@
 #include "KeyGen.hpp"
 
-KeyGen::KeyGen() {
-    for (int i = 0; i < INT_MAX; i++) {
+KeyGen::KeyGen(int n, bool random) : initialSize(n), succeedingKey(n) {
+    for (int i = n - 1; i >= 0; i--) {
         keys.push_back(i);
     }
-    for (int i = 0; i < INT_MAX; i++) {
-        int j = rand() % INT_MAX;
-        int temp = keys[i];
-        keys[i] = keys[j];
-        keys[j] = temp;
+    if (random) {
+        for (int i = 0; i < n; i++) {
+            int j = rand() % n;
+            int temp = keys[i];
+            keys[i] = keys[j];
+            keys[j] = temp;
+        }
     }
-    initialSize = INT_MAX;
-    succeedingKey = INT_MAX;
-}
-
-KeyGen::KeyGen(int n) {
-    for (int i = 0; i < n; i++) {
-        keys.push_back(i);
-    }
-    for (int i = 0; i < n; i++) {
-        int j = rand() % n;
-        int temp = keys[i];
-        keys[i] = keys[j];
-        keys[j] = temp;
-    }
-    initialSize = n;
-    succeedingKey = n;
 }
 
 int KeyGen::nextKey(){
@@ -38,7 +24,7 @@ int KeyGen::nextKey(){
 }
 
 void KeyGen::addKeys() {
-    for (int i = 0; i < initialSize; i++) {
+    for (int i = initialSize - 1; i >= 0; i--) {
         keys.push_back(i + succeedingKey);
     }
     for (int i = 0; i < initialSize; i++) {

@@ -24,7 +24,10 @@ public:
     void print() const;
 
     bool isLeaf() const;
-    bool isFull() const;
+    bool isMin() const;
+    bool isMax() const;
+    bool canGive() const;
+    bool canReceive() const;
     bool isOverflown() const;
     bool isUnderflown() const;
 };

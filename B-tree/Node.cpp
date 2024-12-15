@@ -71,8 +71,20 @@ bool Node::isLeaf() const {
     return children.empty();
 }
 
-bool Node::isFull() const {
+bool Node::isMin() const {
+    return elements.size() == MIN_ELEMENTS;
+}
+
+bool Node::isMax() const {
     return elements.size() == MAX_ELEMENTS;
+}
+
+bool Node::canGive() const {
+    return elements.size() > MIN_ELEMENTS;
+}
+
+bool Node::canReceive() const {
+    return elements.size() < MAX_ELEMENTS;
 }
 
 bool Node::isOverflown() const {
