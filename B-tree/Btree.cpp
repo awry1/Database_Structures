@@ -117,7 +117,9 @@ void Btree::insertElement(Element element) {
         node->writeToFile();
     }
     unloadNodes();
-    std::cout << "key " << element.key << " added" << std::endl;
+    if (display) {
+        std::cout << "key " << element.key << " added" << std::endl;
+    }
 }
 
 void Btree::insertRecord(Record record) {
@@ -194,7 +196,9 @@ void Btree::deleteElement(Element element) {
         }
     }
     unloadNodes();
-    std::cout << "key " << element.key << " deleted" << std::endl;
+    if (display) {
+        std::cout << "key " << element.key << " deleted" << std::endl;
+    }
 }
 
 void Btree::deleteRecord(int key) {

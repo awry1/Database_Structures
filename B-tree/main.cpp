@@ -3,7 +3,7 @@
 #include "KeyGen.hpp"
 #include "Node.hpp"
 #include <iostream>
-constexpr auto DISPLAY = false;
+constexpr auto DISPLAY = true;
 std::vector<int> existingKeys;
 KeyGen keyGen(1000, true);
 
@@ -82,7 +82,6 @@ static void deleteRecords(Btree& btree) {
     }
     std::random_shuffle(existingKeys.begin(), existingKeys.end());
     for (int i = 0; i < n; i++) {
-        //std::cout << "Deleting key " << existingKeys.back() << std::endl;
         btree.deleteRecord(existingKeys.back());
         if (DISPLAY) {
             btree.printTree();
@@ -205,8 +204,7 @@ void programLoop() {
 }
 
 int main() {
-    //srand(unsigned int(time(NULL)));
-    srand(42);
+    srand(unsigned int(time(NULL)));
 
     programLoop();
 }
