@@ -7,7 +7,7 @@ constexpr auto DISPLAY = true;
 std::vector<int> existingKeys;
 KeyGen keyGen(1000, true);
 
-void clearConsole() {
+static void clearConsole() {
 #ifdef _WIN32
     system("cls");
 #else
@@ -32,11 +32,7 @@ static void printRecordsFile(std::string fileName) {
     std::cout << std::endl;
 }
 
-static void generateRecords(Btree& btree) {
-    int n;
-    std::cout << "Enter number of records: ";
-    std::cin >> n;
-    std::cin.ignore();
+static void generateRecords(Btree& btree, int n) {
     for (int i = 0; i < n; i++) {
         Record record;
         record.randomize();
@@ -48,13 +44,16 @@ static void generateRecords(Btree& btree) {
         existingKeys.push_back(record.key);
     }
     std::cout << "Added " << n << " records to tree" << std::endl;
+    int reads = btree.reads / n;
+    int writes = btree.writes / n;
+    btree.reads = 0;
+    btree.writes = 0;
+    std::ofstream file("results.txt", std::ios::app);
+    file << "inserts: " << n << " | av reads: " << reads << " | av writes: " << writes << std::endl;
+    file.close();
 }
 
-static void updateRecords(Btree& btree) {
-    int n;
-    std::cout << "Enter number of records to update: ";
-    std::cin >> n;
-    std::cin.ignore();
+static void updateRecords(Btree& btree, int n) {
     if (n > existingKeys.size()) {
         std::cout << "Not enough records in tree" << std::endl;
         std::cout << "Updating all records in tree" << std::endl;
@@ -68,13 +67,16 @@ static void updateRecords(Btree& btree) {
         btree.updateRecord(record);
     }
     std::cout << "Updated " << n << " records in tree" << std::endl;
+    int reads = btree.reads / n;
+    int writes = btree.writes / n;
+    btree.reads = 0;
+    btree.writes = 0;
+    std::ofstream file("results.txt", std::ios::app);
+    file << "updates: " << n << " | av reads: " << reads << " | av writes: " << writes << std::endl;
+    file.close();
 }
 
-static void deleteRecords(Btree& btree) {
-    int n;
-    std::cout << "Enter number of records to delete: ";
-    std::cin >> n;
-    std::cin.ignore();
+static void deleteRecords(Btree& btree, int n) {
     if (n > existingKeys.size()) {
         std::cout << "Not enough records in tree" << std::endl;
         std::cout << "Deleting all records from tree" << std::endl;
@@ -89,9 +91,66 @@ static void deleteRecords(Btree& btree) {
         existingKeys.pop_back();
     }
     std::cout << "Deleted " << n << " records from tree" << std::endl;
+    int reads = btree.reads / n;
+    int writes = btree.writes / n;
+    btree.reads = 0;
+    btree.writes = 0;
+    std::ofstream file("results.txt", std::ios::app);
+    file << "deletes: " << n << " | av reads: " << reads << " | av writes: " << writes << std::endl;
+    file.close();
 }
 
-void printMetaMenu() {
+static void experiment(Btree& btree) {
+    int i, u, d;
+    std::ifstream file("experiment.txt");
+    if (!file.is_open()) {
+        std::cout << "File experiment.txt not found, creating new file (100, 50, 75)" << std::endl;
+        std::ofstream file("experiment.txt");
+        file << 100 << " " << 50 << " " << 75 << std::endl;
+        file.close();
+        i = 100;
+        u = 50;
+        d = 75;
+    }
+    else {
+        file >> i >> u >> d;
+        file.close();
+    }
+
+    btree.clearFiles();
+    generateRecords(btree, i);
+    updateRecords(btree, u);
+    deleteRecords(btree, d);
+    btree.clearFiles();
+
+    std::cout << "Experiment completed" << std::endl;
+}
+
+static void userGenerateRecords(Btree& btree) {
+    int n;
+    std::cout << "Enter number of records: ";
+    std::cin >> n;
+    std::cin.ignore();
+    generateRecords(btree, n);
+}
+
+static void userUpdateRecords(Btree& btree) {
+    int n;
+    std::cout << "Enter number of records to update: ";
+    std::cin >> n;
+    std::cin.ignore();
+    updateRecords(btree, n);
+}
+
+static void userDeleteRecords(Btree& btree) {
+    int n;
+    std::cout << "Enter number of records to delete: ";
+    std::cin >> n;
+    std::cin.ignore();
+    deleteRecords(btree, n);
+}
+
+static void printMoreMenu() {
     std::cout << std::endl;
     std::cout << "1. Generate records" << std::endl;
     std::cout << "2. Update records" << std::endl;
@@ -99,29 +158,29 @@ void printMetaMenu() {
     std::cout << "4. Clear files" << std::endl;
     std::cout << std::endl;
     std::cout << "5. Print records file" << std::endl;
+    std::cout << "6. Execute saved instuctions" << std::endl;
     std::cout << std::endl;
+    std::cout << "9. Back" << std::endl;
     std::cout << "0. Exit" << std::endl;
-    std::cout << std::endl;
-    std::cout << "-1. Back" << std::endl;
     std::cout << std::endl;
 }
 
-void metaCommands(Btree& btree) {
+static void moreCommands(Btree& btree) {
     int choice;
     while (true) {
-        printMetaMenu();
+        printMoreMenu();
         std::cout << "Enter choice: ";
         std::cin >> choice;
         std::cin.ignore();
         switch (choice) {
         case 1:
-            generateRecords(btree);
+            userGenerateRecords(btree);
             break;
         case 2:
-            updateRecords(btree);
+            userUpdateRecords(btree);
             break;
         case 3:
-            deleteRecords(btree);
+            userDeleteRecords(btree);
             break;
         case 4:
             btree.clearFiles();
@@ -131,11 +190,15 @@ void metaCommands(Btree& btree) {
         case 5:
             printRecordsFile(RECORDS_FILE);
             break;
-        case 0:
-            exit(0);
+        case 6:
+            experiment(btree);
             break;
-        case -1:
+        case 9:
             return;
+            break;
+        case 0:
+            btree.deleteTree();
+            exit(0);
             break;
         default:
             std::cout << "Invalid choice" << std::endl;
@@ -144,7 +207,7 @@ void metaCommands(Btree& btree) {
     }
 }
 
-void printMenu() {
+static void printMenu() {
     std::cout << std::endl;
     std::cout << "1. Insert record" << std::endl;
     std::cout << "2. Update record" << std::endl;
@@ -154,13 +217,12 @@ void printMenu() {
     std::cout << "5. Print tree" << std::endl;
     std::cout << "6. Print all" << std::endl;
     std::cout << std::endl;
+    std::cout << "9. More commands" << std::endl;
     std::cout << "0. Exit" << std::endl;
-    std::cout << std::endl;
-    std::cout << "-1. Meta commands" << std::endl;
     std::cout << std::endl;
 }
 
-void programLoop() {
+static void programLoop() {
     Btree btree(DISPLAY);
 
     std::cout << "B-tree" << std::endl;
@@ -189,12 +251,12 @@ void programLoop() {
         case 6:
             btree.printAllRecords();
             break;
+        case 9:
+            moreCommands(btree);
+            break;
         case 0:
             btree.deleteTree();
             exit(0);
-            break;
-        case -1:
-            metaCommands(btree);
             break;
         default:
             std::cout << "Invalid choice" << std::endl;
@@ -208,6 +270,3 @@ int main() {
 
     programLoop();
 }
-
-// TODO:
-// read and write counter

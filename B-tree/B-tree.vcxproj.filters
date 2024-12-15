@@ -59,4 +59,18 @@
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="experiment.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="results.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="free_nodes.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="free_records.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

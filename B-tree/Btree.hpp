@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <queue>
 #include <vector>
+constexpr auto FREE_NODES_FILE = "free_nodes.txt";
+constexpr auto FREE_RECORDS_FILE = "free_records.txt";
 
 class Btree {
 public:
@@ -11,6 +13,8 @@ public:
     std::vector<int> freeNodes; // Deleted nodes offsets in pages.bin
     std::vector<int> freeRecords; // Deleted records offsets in records.bin
     bool display;
+    double reads;
+    double writes;
 
     Btree(bool display);
 
@@ -43,6 +47,7 @@ public:
     void printReverse(Node* node, const std::string& prefix = " ", bool isLast = true);
     void printALL(Node* node);
 
+    void reorganizeFiles();
     void clearFiles();
     void unloadNodes();
     void deleteTree();
