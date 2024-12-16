@@ -53,6 +53,9 @@ void Btree::insertRecord() {
     if (display) {
         printTree();
     }
+    std::cout << "Reads: " << reads << " Writes: " << writes << std::endl;
+    reads = 0;
+    writes = 0;
 }
 
 void Btree::updateRecord() {
@@ -60,6 +63,9 @@ void Btree::updateRecord() {
     Record record;
     record.readFromConsole();
     updateRecord(record);
+    std::cout << "Reads: " << reads << " Writes: " << writes << std::endl;
+    reads = 0;
+    writes = 0;
 }
 
 void Btree::deleteRecord() {
@@ -72,6 +78,9 @@ void Btree::deleteRecord() {
     if (display) {
         printTree();
     }
+    std::cout << "Reads: " << reads << " Writes: " << writes << std::endl;
+    reads = 0;
+    writes = 0;
 }
 
 void Btree::printRecord() {
@@ -81,6 +90,9 @@ void Btree::printRecord() {
     std::cin >> key;
     std::cin.ignore();
     printRecord(key);
+    std::cout << "Reads: " << reads << " Writes: " << writes << std::endl;
+    reads = 0;
+    writes = 0;
 }
 
 void Btree::printTree() {
@@ -372,11 +384,12 @@ void Btree::split(Node* node) {
         node->children = std::vector<int>(children.begin(), children.begin() + mid + 1);
         sibling->children = std::vector<int>(children.begin() + mid + 1, children.end());
     }
-    node->writeToFile(); writes += 1;
     sibling->writeToFile(); writes += 1;
 
     Node* parent = node->parent;
     if (parent != nullptr) {
+        node->writeToFile(); writes += 1;
+
         int i = 0;
         while (i < parent->children.size() && parent->children[i] != node->offset) {
             i++;
@@ -403,8 +416,8 @@ void Btree::split(Node* node) {
             offset = freeNodes.back();
             freeNodes.pop_back();
         }
-        root->offset = offset;
-        root->writeToFile(); writes += 1;
+        node->offset = offset;
+        node->writeToFile(); writes += 1;
 
         parent = new Node(0);
         parent->elements.push_back(middle);

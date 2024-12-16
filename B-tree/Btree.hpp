@@ -47,7 +47,6 @@ public:
     void printReverse(Node* node, const std::string& prefix = " ", bool isLast = true);
     void printALL(Node* node);
 
-    void reorganizeFiles();
     void clearFiles();
     void unloadNodes();
     void deleteTree();
