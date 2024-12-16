@@ -4,6 +4,7 @@
 #include "Node.hpp"
 #include <iostream>
 constexpr auto DISPLAY = true;
+
 std::vector<int> existingKeys;
 KeyGen keyGen(1000, true);
 
