@@ -1,6 +1,6 @@
 #pragma once
-#include <fstream>
 #include "Element.hpp"
+#include <fstream>
 constexpr auto PAGES_FILE = "pages.bin";
 constexpr auto NODE_DEGREE = 2;
 constexpr auto MIN_ELEMENTS = NODE_DEGREE;
@@ -17,7 +17,6 @@ public:
 
     Node();
     Node(int offset);
-    ~Node();
 
     void writeToFile() const;
     void readFromFile();

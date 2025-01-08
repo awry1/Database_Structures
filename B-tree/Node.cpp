@@ -10,10 +10,6 @@ Node::Node(int offset) : offset(offset), parent(nullptr) {
     children = std::vector<int>();
 }
 
-Node::~Node() {
-    //std::cout << "Node " << offset << " deleted" << std::endl;
-}
-
 void Node::writeToFile() const {
     std::fstream file(PAGES_FILE, std::ios::binary | std::ios::in | std::ios::out);
     file.seekp(offset);
